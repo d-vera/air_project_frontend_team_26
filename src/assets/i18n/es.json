@@ -1,0 +1,92 @@
+{
+  "APP": {
+    "NAME": "Air Project",
+    "USER_MANAGEMENT": "Gestión de Usuarios"
+  },
+  "NAV": {
+    "DASHBOARD": "Panel Principal",
+    "PROFILE": "Mi Perfil",
+    "ADMIN_USERS": "Gestionar Usuarios",
+    "LOGOUT": "Cerrar Sesión",
+    "LOGIN": "Iniciar Sesión",
+    "REGISTER": "Registrarse"
+  },
+  "AUTH": {
+    "LOGIN_TITLE": "Bienvenido de Nuevo",
+    "LOGIN_SUBTITLE": "Inicia sesión en tu cuenta para acceder a la plataforma",
+    "REGISTER_TITLE": "Crear una Cuenta",
+    "REGISTER_SUBTITLE": "Únete a Air Project para gestionar datos y usuarios",
+    "EMAIL": "Correo Electrónico",
+    "PASSWORD": "Contraseña",
+    "FIRST_NAME": "Nombre",
+    "LAST_NAME": "Apellido",
+    "LOGIN_BTN": "Iniciar Sesión",
+    "REGISTER_BTN": "Crear Cuenta",
+    "NO_ACCOUNT": "¿No tienes una cuenta?",
+    "HAVE_ACCOUNT": "¿Ya tienes una cuenta?",
+    "REGISTER_LINK": "Regístrate ahora",
+    "LOGIN_LINK": "Inicia sesión",
+    "INVALID_CREDENTIALS": "Correo o contraseña incorrectos",
+    "EMAIL_EXISTS": "Este correo electrónico ya está registrado",
+    "SESSION_EXPIRED": "Tu sesión ha expirado. Por favor, inicia sesión nuevamente.",
+    "PASSWORD_MIN_LENGTH": "La contraseña debe tener al menos 8 caracteres"
+  },
+  "PROFILE": {
+    "TITLE": "Mi Perfil",
+    "SUBTITLE": "Consulta y actualiza tu información personal",
+    "ACCOUNT_DETAILS": "Detalles de la Cuenta",
+    "ID": "ID de Usuario",
+    "ROLE": "Rol",
+    "CREATED_AT": "Miembro Desde",
+    "ACTIVE": "Estado",
+    "ACTIVE_STATUS": "Activo",
+    "INACTIVE_STATUS": "Inactivo",
+    "EDIT_PROFILE": "Editar Perfil",
+    "SAVE_CHANGES": "Guardar Cambios",
+    "CANCEL": "Cancelar",
+    "NEW_PASSWORD_HINT": "Déjalo en blanco para mantener la contraseña actual",
+    "UPDATE_SUCCESS": "¡Perfil actualizado con éxito!",
+    "UPDATE_ERROR": "Error al actualizar el perfil. Por favor, inténtalo de nuevo."
+  },
+  "ADMIN": {
+    "TITLE": "Gestión de Usuarios",
+    "SUBTITLE": "Ver, gestionar, activar/desactivar usuarios y asignar roles",
+    "ALL_USERS": "Todos los Usuarios",
+    "TOTAL_USERS": "Total de Usuarios",
+    "SEARCH_PLACEHOLDER": "Buscar por nombre o correo...",
+    "VIEW_USER": "Ver Detalles",
+    "EDIT_USER": "Editar Usuario",
+    "DEACTIVATE": "Desactivar",
+    "ACTIVATE": "Activar",
+    "CHANGE_ROLE": "Cambiar Rol",
+    "ASSIGN_ROLE_TITLE": "Asignar Rol",
+    "CONFIRM_DEACTIVATE_TITLE": "Desactivar Usuario",
+    "CONFIRM_DEACTIVATE_MSG": "¿Estás seguro de que deseas desactivar a {{name}}? Ya no podrá iniciar sesión.",
+    "CONFIRM": "Desactivar",
+    "ROLE_UPDATED": "Rol actualizado con éxito",
+    "USER_DEACTIVATED": "Usuario desactivado con éxito",
+    "USER_ACTIVATED": "Usuario activado con éxito",
+    "NO_USERS_FOUND": "No se encontraron usuarios con esos criterios",
+    "BACK_TO_USERS": "Volver a Usuarios",
+    "USER_DETAILS": "Información del Usuario",
+    "ROLE_ADMIN": "Administrador",
+    "ROLE_REGISTERED_USER": "Usuario Registrado"
+  },
+  "DASHBOARD": {
+    "WELCOME": "¡Bienvenido de nuevo, {{name}}!",
+    "ROLE_INFO": "Has iniciado sesión como {{role}}.",
+    "QUICK_ACTIONS": "Acciones Rápidas",
+    "VIEW_PROFILE": "Gestionar Perfil",
+    "MANAGE_USERS": "Panel de Gestión de Usuarios"
+  },
+  "COMMON": {
+    "LOADING": "Cargando...",
+    "SUCCESS": "Éxito",
+    "ERROR": "Error",
+    "DARK_MODE": "Modo Oscuro",
+    "LIGHT_MODE": "Modo Claro",
+    "SPANISH": "Español",
+    "ENGLISH": "Inglés",
+    "SYSTEM_THEME": "Tema del Sistema"
+  }
+}

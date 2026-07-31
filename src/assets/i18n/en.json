@@ -1,0 +1,92 @@
+{
+  "APP": {
+    "NAME": "Air Project",
+    "USER_MANAGEMENT": "User Management"
+  },
+  "NAV": {
+    "DASHBOARD": "Dashboard",
+    "PROFILE": "My Profile",
+    "ADMIN_USERS": "Manage Users",
+    "LOGOUT": "Log Out",
+    "LOGIN": "Log In",
+    "REGISTER": "Register"
+  },
+  "AUTH": {
+    "LOGIN_TITLE": "Welcome Back",
+    "LOGIN_SUBTITLE": "Log in to your account to access the platform",
+    "REGISTER_TITLE": "Create an Account",
+    "REGISTER_SUBTITLE": "Join Air Project to manage sensor data & users",
+    "EMAIL": "Email Address",
+    "PASSWORD": "Password",
+    "FIRST_NAME": "First Name",
+    "LAST_NAME": "Last Name",
+    "LOGIN_BTN": "Log In",
+    "REGISTER_BTN": "Create Account",
+    "NO_ACCOUNT": "Don't have an account?",
+    "HAVE_ACCOUNT": "Already have an account?",
+    "REGISTER_LINK": "Register now",
+    "LOGIN_LINK": "Log in",
+    "INVALID_CREDENTIALS": "Invalid email or password",
+    "EMAIL_EXISTS": "This email address is already registered",
+    "SESSION_EXPIRED": "Your session has expired. Please log in again.",
+    "PASSWORD_MIN_LENGTH": "Password must be at least 8 characters long"
+  },
+  "PROFILE": {
+    "TITLE": "My Profile",
+    "SUBTITLE": "View and update your personal information",
+    "ACCOUNT_DETAILS": "Account Details",
+    "ID": "User ID",
+    "ROLE": "Role",
+    "CREATED_AT": "Member Since",
+    "ACTIVE": "Status",
+    "ACTIVE_STATUS": "Active",
+    "INACTIVE_STATUS": "Inactive",
+    "EDIT_PROFILE": "Edit Profile",
+    "SAVE_CHANGES": "Save Changes",
+    "CANCEL": "Cancel",
+    "NEW_PASSWORD_HINT": "Leave blank to keep current password",
+    "UPDATE_SUCCESS": "Profile updated successfully!",
+    "UPDATE_ERROR": "Failed to update profile. Please try again."
+  },
+  "ADMIN": {
+    "TITLE": "User Management",
+    "SUBTITLE": "View, manage, activate/deactivate users and assign roles",
+    "ALL_USERS": "All Users",
+    "TOTAL_USERS": "Total Users",
+    "SEARCH_PLACEHOLDER": "Search by name or email...",
+    "VIEW_USER": "View Details",
+    "EDIT_USER": "Edit User",
+    "DEACTIVATE": "Deactivate",
+    "ACTIVATE": "Activate",
+    "CHANGE_ROLE": "Change Role",
+    "ASSIGN_ROLE_TITLE": "Assign Role",
+    "CONFIRM_DEACTIVATE_TITLE": "Deactivate User",
+    "CONFIRM_DEACTIVATE_MSG": "Are you sure you want to deactivate {{name}}? They will no longer be able to log in.",
+    "CONFIRM": "Deactivate",
+    "ROLE_UPDATED": "Role updated successfully",
+    "USER_DEACTIVATED": "User deactivated successfully",
+    "USER_ACTIVATED": "User activated successfully",
+    "NO_USERS_FOUND": "No users found matching your criteria",
+    "BACK_TO_USERS": "Back to Users",
+    "USER_DETAILS": "User Information",
+    "ROLE_ADMIN": "Administrator",
+    "ROLE_REGISTERED_USER": "Registered User"
+  },
+  "DASHBOARD": {
+    "WELCOME": "Welcome back, {{name}}!",
+    "ROLE_INFO": "You are logged in as {{role}}.",
+    "QUICK_ACTIONS": "Quick Actions",
+    "VIEW_PROFILE": "Manage Profile",
+    "MANAGE_USERS": "User Management Panel"
+  },
+  "COMMON": {
+    "LOADING": "Loading...",
+    "SUCCESS": "Success",
+    "ERROR": "Error",
+    "DARK_MODE": "Dark Mode",
+    "LIGHT_MODE": "Light Mode",
+    "SPANISH": "Spanish",
+    "ENGLISH": "English",
+    "SYSTEM_THEME": "System Theme"
+  }
+}
