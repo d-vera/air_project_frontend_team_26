@@ -14,11 +14,10 @@ export const routes: Routes = [
     loadComponent: () => import('./features/auth/register/register.component').then(m => m.RegisterComponent)
   },
 
-  // Authenticated Routes wrapped in Shell Layout
+  // Dashboard & Profile Routes wrapped in Shell Layout
   {
     path: 'dashboard',
     component: ShellComponent,
-    canActivate: [authGuard],
     children: [
       {
         path: '',
@@ -26,6 +25,7 @@ export const routes: Routes = [
       },
       {
         path: 'profile',
+        canActivate: [authGuard],
         loadComponent: () => import('./features/dashboard/profile/profile.component').then(m => m.ProfileComponent)
       }
     ]
