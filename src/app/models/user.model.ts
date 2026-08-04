@@ -1,4 +1,6 @@
 export type UserRole = 'REGISTERED_USER' | 'ADMIN';
+export type PreferredTheme = 'DARK' | 'LIGHT';
+export type PreferredLanguage = 'es' | 'en';
 
 export interface User {
   id: number;
@@ -7,6 +9,8 @@ export interface User {
   lastName: string;
   role: UserRole;
   active: boolean;
+  preferredTheme?: PreferredTheme;
+  preferredLanguage?: PreferredLanguage;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -18,6 +22,8 @@ export interface UserResponse {
   lastName: string;
   role: UserRole;
   active: boolean;
+  preferredTheme?: PreferredTheme;
+  preferredLanguage?: PreferredLanguage;
   createdAt: string;
   updatedAt: string;
 }
@@ -28,6 +34,13 @@ export interface UpdateUserRequest {
   password?: string;
 }
 
+export interface UpdatePreferencesRequest {
+  preferredTheme?: PreferredTheme;
+  preferredLanguage?: PreferredLanguage;
+}
+
 export interface AssignRoleRequest {
   role: UserRole;
 }
+
+

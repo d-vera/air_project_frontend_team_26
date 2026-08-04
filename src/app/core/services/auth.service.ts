@@ -1,14 +1,18 @@
-import { Injectable, signal, inject } from '@angular/core';
+import { Injectable, signal, inject, Injector } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { LoginRequest, RegisterRequest, AuthResponse } from '../../models/auth.model';
 import { UserRole } from '../../models/user.model';
+import { UserService } from './user.service';
+import { ThemeService, Theme } from './theme.service';
+import { LanguageService } from './language.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   private http = inject(HttpClient);
+  private injector = inject(Injector);
 
   private readonly TOKEN_KEY = 'auth_token';
   private readonly ROLE_KEY = 'user_role';
@@ -18,15 +22,27 @@ export class AuthService {
   email = signal<string | null>(this.getStoredEmail());
   role = signal<UserRole | null>(this.getStoredRole());
 
+  constructor() {
+    if (this.isAuthenticated()) {
+      this.loadUserPreferences();
+    }
+  }
+
   login(credentials: LoginRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>('/api/auth/login', credentials).pipe(
-      tap(res => this.saveAuthData(res))
+      tap(res => {
+        this.saveAuthData(res);
+        this.loadUserPreferences();
+      })
     );
   }
 
   register(data: RegisterRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>('/api/auth/register', data).pipe(
-      tap(res => this.saveAuthData(res))
+      tap(res => {
+        this.saveAuthData(res);
+        this.loadUserPreferences();
+      })
     );
   }
 
@@ -53,6 +69,29 @@ export class AuthService {
 
   isAdmin(): boolean {
     return this.role() === 'ADMIN';
+  }
+
+  loadUserPreferences(): void {
+    if (!this.isAuthenticated()) return;
+
+    const userService = this.injector.get(UserService);
+    const themeService = this.injector.get(ThemeService);
+    const languageService = this.injector.get(LanguageService);
+
+    userService.getMe().subscribe({
+      next: (user) => {
+        if (user.preferredTheme) {
+          const theme: Theme = user.preferredTheme === 'DARK' ? 'dark' : 'light';
+          themeService.setTheme(theme, false);
+        }
+        if (user.preferredLanguage) {
+          languageService.setLanguage(user.preferredLanguage, false);
+        }
+      },
+      error: (err) => {
+        console.warn('Failed to load user preferences from backend:', err);
+      }
+    });
   }
 
   private saveAuthData(response: AuthResponse): void {
@@ -87,3 +126,4 @@ export class AuthService {
     return localStorage.getItem(this.ROLE_KEY) as UserRole | null;
   }
 }
+

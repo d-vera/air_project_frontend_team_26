@@ -1,5 +1,7 @@
 import { Injectable, signal, inject } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
+import { UserService } from './user.service';
+import { PreferredLanguage } from '../../models/user.model';
 
 export type Language = 'es' | 'en';
 
@@ -8,6 +10,7 @@ export type Language = 'es' | 'en';
 })
 export class LanguageService {
   private translate = inject(TranslateService);
+  private userService = inject(UserService);
   private readonly LANG_KEY = 'lang';
 
   currentLang = signal<Language>(this.initialLanguage());
@@ -19,15 +22,26 @@ export class LanguageService {
     this.translate.use(lang);
   }
 
-  setLanguage(lang: Language): void {
+  setLanguage(lang: Language, syncBackend = true): void {
     this.currentLang.set(lang);
     localStorage.setItem(this.LANG_KEY, lang);
     this.translate.use(lang);
+
+    if (syncBackend && this.isAuthenticated()) {
+      const preferredLanguage: PreferredLanguage = lang;
+      this.userService.updatePreferredLanguage(preferredLanguage).subscribe({
+        error: (err) => console.warn('Failed to sync language preference to backend:', err)
+      });
+    }
   }
 
-  toggleLanguage(): void {
+  private isAuthenticated(): boolean {
+    return !!localStorage.getItem('auth_token');
+  }
+
+  toggleLanguage(syncBackend = true): void {
     const nextLang: Language = this.currentLang() === 'es' ? 'en' : 'es';
-    this.setLanguage(nextLang);
+    this.setLanguage(nextLang, syncBackend);
   }
 
   private initialLanguage(): Language {

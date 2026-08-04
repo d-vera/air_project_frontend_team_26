@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { UserResponse, UpdateUserRequest, AssignRoleRequest } from '../../models/user.model';
+import { UserResponse, UpdateUserRequest, UpdatePreferencesRequest, AssignRoleRequest, PreferredTheme, PreferredLanguage } from '../../models/user.model';
 
 @Injectable({
   providedIn: 'root'
@@ -15,6 +15,18 @@ export class UserService {
 
   updateMe(data: UpdateUserRequest): Observable<UserResponse> {
     return this.http.put<UserResponse>('/api/users/me', data);
+  }
+
+  updatePreferences(data: UpdatePreferencesRequest): Observable<UserResponse> {
+    return this.http.patch<UserResponse>('/api/users/me/preferences', data);
+  }
+
+  updatePreferredTheme(theme: PreferredTheme): Observable<UserResponse> {
+    return this.updatePreferences({ preferredTheme: theme });
+  }
+
+  updatePreferredLanguage(language: PreferredLanguage): Observable<UserResponse> {
+    return this.updatePreferences({ preferredLanguage: language });
   }
 
   getAllUsers(): Observable<UserResponse[]> {

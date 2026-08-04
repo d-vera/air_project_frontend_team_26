@@ -1,4 +1,6 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, inject } from '@angular/core';
+import { UserService } from './user.service';
+import { PreferredTheme } from '../../models/user.model';
 
 export type Theme = 'light' | 'dark';
 
@@ -7,6 +9,7 @@ export type Theme = 'light' | 'dark';
 })
 export class ThemeService {
   private readonly THEME_KEY = 'theme';
+  private userService = inject(UserService);
 
   isDarkMode = signal<boolean>(this.initialDarkMode());
 
@@ -14,18 +17,27 @@ export class ThemeService {
     this.applyTheme(this.isDarkMode());
   }
 
-  toggleTheme(): void {
+  toggleTheme(syncBackend = true): void {
     const newMode = !this.isDarkMode();
-    this.isDarkMode.set(newMode);
-    localStorage.setItem(this.THEME_KEY, newMode ? 'dark' : 'light');
-    this.applyTheme(newMode);
+    this.setTheme(newMode ? 'dark' : 'light', syncBackend);
   }
 
-  setTheme(theme: Theme): void {
+  setTheme(theme: Theme, syncBackend = true): void {
     const isDark = theme === 'dark';
     this.isDarkMode.set(isDark);
     localStorage.setItem(this.THEME_KEY, theme);
     this.applyTheme(isDark);
+
+    if (syncBackend && this.isAuthenticated()) {
+      const preferredTheme: PreferredTheme = isDark ? 'DARK' : 'LIGHT';
+      this.userService.updatePreferredTheme(preferredTheme).subscribe({
+        error: (err) => console.warn('Failed to sync theme preference to backend:', err)
+      });
+    }
+  }
+
+  private isAuthenticated(): boolean {
+    return !!localStorage.getItem('auth_token');
   }
 
   private initialDarkMode(): boolean {
