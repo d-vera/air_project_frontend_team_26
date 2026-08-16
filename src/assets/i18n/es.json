@@ -30,7 +30,8 @@
     "INVALID_CREDENTIALS": "Correo o contraseña incorrectos",
     "EMAIL_EXISTS": "Este correo electrónico ya está registrado",
     "SESSION_EXPIRED": "Tu sesión ha expirado. Por favor, inicia sesión nuevamente.",
-    "PASSWORD_MIN_LENGTH": "La contraseña debe tener al menos 8 caracteres"
+    "PASSWORD_MIN_LENGTH": "La contraseña debe tener al menos 8 caracteres",
+    "SHOW_PASSWORD": "Ver contraseña"
   },
   "PROFILE": {
     "TITLE": "Mi Perfil",

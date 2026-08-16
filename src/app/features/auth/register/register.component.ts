@@ -120,7 +120,7 @@ import { LanguageToggleComponent } from '../../../shared/components/language-tog
               <input
                 id="password"
                 name="password"
-                type="password"
+                [type]="showPassword() ? 'text' : 'password'"
                 [(ngModel)]="password"
                 required
                 minlength="8"
@@ -133,6 +133,19 @@ import { LanguageToggleComponent } from '../../../shared/components/language-tog
                   {{ 'AUTH.PASSWORD_MIN_LENGTH' | translate }}
                 </p>
               }
+              <!-- Show password checkbox -->
+              <div class="flex items-center mt-2.5">
+                <input
+                  id="showPasswordRegister"
+                  type="checkbox"
+                  [checked]="showPassword()"
+                  (change)="showPassword.set(!showPassword())"
+                  class="w-4 h-4 rounded text-sky-600 bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 focus:ring-sky-500 cursor-pointer"
+                />
+                <label for="showPasswordRegister" class="ml-2 text-xs font-medium text-slate-600 dark:text-slate-400 cursor-pointer select-none">
+                  {{ 'AUTH.SHOW_PASSWORD' | translate }}
+                </label>
+              </div>
             </div>
 
             <!-- Submit Button -->
@@ -179,6 +192,7 @@ export class RegisterComponent {
   password = '';
   firstName = '';
   lastName = '';
+  showPassword = signal<boolean>(false);
   loading = signal<boolean>(false);
   errorMessage = signal<string | null>(null);
 

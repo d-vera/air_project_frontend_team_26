@@ -30,7 +30,8 @@
     "INVALID_CREDENTIALS": "Invalid email or password",
     "EMAIL_EXISTS": "This email address is already registered",
     "SESSION_EXPIRED": "Your session has expired. Please log in again.",
-    "PASSWORD_MIN_LENGTH": "Password must be at least 8 characters long"
+    "PASSWORD_MIN_LENGTH": "Password must be at least 8 characters long",
+    "SHOW_PASSWORD": "Show password"
   },
   "PROFILE": {
     "TITLE": "My Profile",

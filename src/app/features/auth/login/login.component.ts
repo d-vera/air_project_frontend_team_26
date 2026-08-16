@@ -92,13 +92,26 @@ import { LanguageToggleComponent } from '../../../shared/components/language-tog
               <input
                 id="password"
                 name="password"
-                type="password"
+                [type]="showPassword() ? 'text' : 'password'"
                 [(ngModel)]="password"
                 required
                 #passwordInput="ngModel"
                 [placeholder]="'AUTH.PASSWORD' | translate"
                 class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500 dark:focus:ring-sky-400 focus:bg-white dark:focus:bg-slate-800 transition-all text-sm"
               />
+              <!-- Show password checkbox -->
+              <div class="flex items-center mt-2.5">
+                <input
+                  id="showPasswordLogin"
+                  type="checkbox"
+                  [checked]="showPassword()"
+                  (change)="showPassword.set(!showPassword())"
+                  class="w-4 h-4 rounded text-sky-600 bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 focus:ring-sky-500 cursor-pointer"
+                />
+                <label for="showPasswordLogin" class="ml-2 text-xs font-medium text-slate-600 dark:text-slate-400 cursor-pointer select-none">
+                  {{ 'AUTH.SHOW_PASSWORD' | translate }}
+                </label>
+              </div>
             </div>
 
             <!-- Submit Button -->
@@ -144,6 +157,7 @@ export class LoginComponent {
 
   email = '';
   password = '';
+  showPassword = signal<boolean>(false);
   loading = signal<boolean>(false);
   errorMessage = signal<string | null>(null);
   sessionExpired = signal<boolean>(false);
