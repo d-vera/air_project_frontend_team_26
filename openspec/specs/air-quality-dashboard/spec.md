@@ -1,5 +1,8 @@
 # air-quality-dashboard Specification
 
+## Purpose
+Provide real-time air quality metric visualization and historical trend analysis across multiple metrics and time ranges with role-based access control.
+
 ## Requirements
 
 ### Requirement: Real-time air quality metric display
