@@ -11,9 +11,12 @@ import {
   TimeRangeShortcut,
   CustomDateRange
 } from '../../models/air-quality.model';
+import { SensorService } from '../../core/services/sensor.service';
+import { Sensor } from '../../models/sensor.model';
 import { RealTimeCardsComponent } from './components/real-time-cards/real-time-cards.component';
 import { HistoricalChartComponent } from './components/historical-chart/historical-chart.component';
 import { LoginPromptModalComponent } from '../../shared/components/login-prompt-modal/login-prompt-modal.component';
+import { SensorMapComponent } from '../../shared/components/sensor-map/sensor-map.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -24,7 +27,8 @@ import { LoginPromptModalComponent } from '../../shared/components/login-prompt-
     TranslatePipe,
     RealTimeCardsComponent,
     HistoricalChartComponent,
-    LoginPromptModalComponent
+    LoginPromptModalComponent,
+    SensorMapComponent
   ],
   template: `
     <div class="space-y-8">
@@ -61,6 +65,32 @@ import { LoginPromptModalComponent } from '../../shared/components/login-prompt-
         [selectedDeviceId]="selectedDeviceId()"
         (selectedDeviceIdChange)="onDeviceChange($event)"
       ></app-real-time-cards>
+
+      <!-- Active Sensor Stations Map Section -->
+      <div class="space-y-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-slate-100 flex items-center gap-2.5">
+              <span>Sensor Station Map</span>
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300">
+                Live Status
+              </span>
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+              Geographic coordinates and connectivity health across monitoring points
+            </p>
+          </div>
+        </div>
+
+        <div class="h-[380px] w-full rounded-3xl overflow-hidden shadow-md">
+          <app-sensor-map
+            [sensors]="sensors()"
+            [showLegend]="true"
+            [showSelectButton]="true"
+            (sensorSelected)="onMapSensorSelected($event)"
+          ></app-sensor-map>
+        </div>
+      </div>
 
       <!-- Historical Data Trends Section -->
       <app-historical-chart
@@ -143,10 +173,12 @@ import { LoginPromptModalComponent } from '../../shared/components/login-prompt-
 export class DashboardComponent implements OnInit {
   private userService = inject(UserService);
   private airQualityService = inject(AirQualityService);
+  private sensorService = inject(SensorService);
   authService = inject(AuthService);
 
   user = signal<User | null>(null);
 
+  sensors = signal<Sensor[]>([]);
   currentReadings = signal<AirQualityReading[]>([]);
   historicalReadings = signal<AirQualityReading[]>([]);
   deviceList = signal<string[]>([]);
@@ -162,8 +194,80 @@ export class DashboardComponent implements OnInit {
       });
     }
 
+    this.loadSensors();
     this.loadCurrentData();
     this.loadHistoricalData();
+  }
+
+  loadSensors(): void {
+    this.sensorService.getSensors().subscribe({
+      next: (data) => {
+        if (data && data.length > 0) {
+          this.sensors.set(data);
+        } else {
+          this.setFallbackSensors();
+        }
+      },
+      error: () => {
+        this.setFallbackSensors();
+      }
+    });
+  }
+
+  private setFallbackSensors(): void {
+    this.sensors.set([
+      {
+        id: 1,
+        uidSensor: 'ACEA5AC8E720',
+        name: 'Sensor Patio Central',
+        sensorType: 'ESP32_AIR',
+        latitude: -12.046374,
+        longitude: -77.042793,
+        firmwareVersion: '1.0.2',
+        sensorStatus: 'ONLINE',
+        lastSeen: new Date().toISOString(),
+        userId: 1,
+        active: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: 2,
+        uidSensor: 'B189DF621C11',
+        name: 'Sensor Laboratorio Norte',
+        sensorType: 'ESP32_AIR',
+        latitude: -12.052110,
+        longitude: -77.036520,
+        firmwareVersion: '1.0.1',
+        sensorStatus: 'ONLINE',
+        lastSeen: new Date().toISOString(),
+        userId: 2,
+        active: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: 3,
+        uidSensor: 'C993AF718223',
+        name: 'Sensor Estacionamiento Sur',
+        sensorType: 'ESP32_AIR',
+        latitude: -12.061450,
+        longitude: -77.048910,
+        firmwareVersion: '1.0.0',
+        sensorStatus: 'MAINTENANCE',
+        lastSeen: null,
+        userId: null,
+        active: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }
+    ]);
+  }
+
+  onMapSensorSelected(sensor: Sensor): void {
+    if (sensor.uidSensor) {
+      this.onDeviceChange(sensor.uidSensor);
+    }
   }
 
   loadCurrentData(): void {

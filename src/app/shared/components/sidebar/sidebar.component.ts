@@ -125,6 +125,20 @@ import { LanguageToggleComponent } from '../language-toggle/language-toggle.comp
             </svg>
             <span>{{ 'NAV.ADMIN_USERS' | translate }}</span>
           </a>
+
+          <!-- Admin Only: Sensor Management -->
+          <a
+            routerLink="/admin/sensors"
+            routerLinkActive="bg-emerald-600 text-white shadow-md shadow-emerald-600/20 font-semibold"
+            (click)="closeSidebar.emit()"
+            class="flex items-center space-x-3 px-3 py-2.5 rounded-xl font-medium text-sm transition-all text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white group"
+          >
+            <svg class="w-5 h-5 text-slate-500 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            <span>{{ 'NAV.ADMIN_SENSORS' | translate }}</span>
+          </a>
         }
       </nav>
 

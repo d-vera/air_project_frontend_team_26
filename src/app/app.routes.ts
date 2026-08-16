@@ -49,6 +49,10 @@ export const routes: Routes = [
       {
         path: 'users/:id',
         loadComponent: () => import('./features/admin/user-detail/user-detail.component').then(m => m.UserDetailComponent)
+      },
+      {
+        path: 'sensors',
+        loadComponent: () => import('./features/admin/sensor-management/sensor-management.component').then(m => m.SensorManagementComponent)
       }
     ]
   },
