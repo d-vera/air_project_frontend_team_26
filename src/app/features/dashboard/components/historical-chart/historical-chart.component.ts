@@ -13,6 +13,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe } from '@ngx-translate/core';
 import {
   AirQualityReading,
   TimeRangeShortcut,
@@ -46,7 +47,7 @@ Chart.register(
 @Component({
   selector: 'app-historical-chart',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslatePipe],
   template: `
     <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-6">
       <!-- Header and Time Shortcuts -->
@@ -56,10 +57,10 @@ Chart.register(
             <svg class="w-5 h-5 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
             </svg>
-            Historical Environmental Data
+            {{ 'DASHBOARD.HISTORICAL_TITLE' | translate }}
           </h3>
           <p class="text-xs text-slate-500 dark:text-slate-400">
-            Track air pollutant metrics and trends over selected timeframes
+            {{ 'DASHBOARD.HISTORICAL_SUBTITLE' | translate }}
           </p>
         </div>
 
@@ -76,7 +77,7 @@ Chart.register(
             [class.shadow-xs]="activeShortcut === '24h'"
             class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition-all cursor-pointer"
           >
-            Last 24 Hours
+            {{ 'DASHBOARD.TIMEFRAME.LAST_24_HOURS' | translate }}
           </button>
 
           <!-- 7 Days -->
@@ -90,7 +91,7 @@ Chart.register(
             [class.shadow-xs]="activeShortcut === '7d'"
             class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition-all cursor-pointer"
           >
-            Last 7 Days
+            {{ 'DASHBOARD.TIMEFRAME.LAST_7_DAYS' | translate }}
           </button>
 
           <!-- 30 Days -->
@@ -104,7 +105,7 @@ Chart.register(
             [class.shadow-xs]="activeShortcut === '30d'"
             class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition-all cursor-pointer"
           >
-            Last 30 Days
+            {{ 'DASHBOARD.TIMEFRAME.LAST_30_DAYS' | translate }}
           </button>
 
           <!-- Last Year (Restricted) -->
@@ -118,7 +119,7 @@ Chart.register(
             [class.shadow-xs]="activeShortcut === '1y'"
             class="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition-all cursor-pointer"
           >
-            <span>Last Year</span>
+            <span>{{ 'DASHBOARD.TIMEFRAME.LAST_YEAR' | translate }}</span>
             @if (!authService.isAuthenticated()) {
               <svg class="w-3.5 h-3.5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -132,7 +133,7 @@ Chart.register(
       <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200/60 dark:border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
           <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1 shrink-0">
-            Custom Range
+            {{ 'DASHBOARD.CUSTOM_RANGE' | translate }}
             @if (!authService.isAuthenticated()) {
               <svg class="w-3.5 h-3.5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -147,7 +148,7 @@ Chart.register(
               (focus)="checkCustomRangeAuth()"
               class="bg-white dark:bg-slate-900 text-xs px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 focus:outline-hidden"
             />
-            <span class="text-xs text-slate-400">to</span>
+            <span class="text-xs text-slate-400">{{ 'DASHBOARD.TO' | translate }}</span>
             <input
               type="date"
               [(ngModel)]="toDate"
@@ -162,13 +163,13 @@ Chart.register(
           type="button"
           class="w-full sm:w-auto px-4 py-1.5 rounded-xl text-xs font-semibold text-white bg-sky-500 hover:bg-sky-600 transition-colors shadow-xs cursor-pointer"
         >
-          Apply Filter
+          {{ 'DASHBOARD.APPLY_FILTER' | translate }}
         </button>
       </div>
 
       <!-- Metric Metric Toggle Selector for Chart -->
       <div class="flex items-center space-x-2 border-b border-slate-100 dark:border-slate-800/80 pb-3 overflow-x-auto">
-        <span class="text-xs font-semibold text-slate-400 dark:text-slate-500 shrink-0">Metric:</span>
+        <span class="text-xs font-semibold text-slate-400 dark:text-slate-500 shrink-0">{{ 'DASHBOARD.METRIC_LABEL' | translate }}</span>
         <button
           (click)="selectedMetric = 'pm2_5'; renderChart()"
           type="button"
@@ -177,7 +178,7 @@ Chart.register(
           [class.text-slate-600]="selectedMetric !== 'pm2_5'"
           class="px-3 py-1 rounded-lg text-xs font-medium transition-colors cursor-pointer shrink-0"
         >
-          PM 2.5
+          {{ 'DASHBOARD.METRICS.PM2_5' | translate }}
         </button>
         <button
           (click)="selectedMetric = 'pm10'; renderChart()"
@@ -187,7 +188,7 @@ Chart.register(
           [class.text-slate-600]="selectedMetric !== 'pm10'"
           class="px-3 py-1 rounded-lg text-xs font-medium transition-colors cursor-pointer shrink-0"
         >
-          PM 10
+          {{ 'DASHBOARD.METRICS.PM10' | translate }}
         </button>
         <button
           (click)="selectedMetric = 'co2'; renderChart()"
@@ -197,7 +198,7 @@ Chart.register(
           [class.text-slate-600]="selectedMetric !== 'co2'"
           class="px-3 py-1 rounded-lg text-xs font-medium transition-colors cursor-pointer shrink-0"
         >
-          CO₂
+          {{ 'DASHBOARD.METRICS.CO2' | translate }}
         </button>
         <button
           (click)="selectedMetric = 'temperature'; renderChart()"
@@ -207,7 +208,7 @@ Chart.register(
           [class.text-slate-600]="selectedMetric !== 'temperature'"
           class="px-3 py-1 rounded-lg text-xs font-medium transition-colors cursor-pointer shrink-0"
         >
-          Temperature
+          {{ 'DASHBOARD.METRICS.TEMPERATURE' | translate }}
         </button>
       </div>
 

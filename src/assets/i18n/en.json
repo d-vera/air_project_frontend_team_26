@@ -74,11 +74,49 @@
     "ROLE_REGISTERED_USER": "Registered User"
   },
   "DASHBOARD": {
+    "SYSTEM_TITLE": "Air Quality Monitoring System",
+    "ANONYMOUS_TITLE": "Air Quality Dashboard",
+    "ANONYMOUS_SUBTITLE": "Real-time environmental monitoring & air quality metrics across active sensor nodes.",
     "WELCOME": "Welcome back, {{name}}!",
     "ROLE_INFO": "You are logged in as {{role}}.",
     "QUICK_ACTIONS": "Quick Actions",
     "VIEW_PROFILE": "Manage Profile",
-    "MANAGE_USERS": "User Management Panel"
+    "MANAGE_USERS": "User Management Panel",
+    "REAL_TIME_TITLE": "Real-Time Air Quality",
+    "REAL_TIME_SUBTITLE": "Live telemetry readings from active monitoring nodes",
+    "DEVICE_LABEL": "Device:",
+    "ALL_DEVICES": "All Devices",
+    "NODE_PREFIX": "Node:",
+    "METRICS": {
+      "TEMP": "Temp",
+      "HUMIDITY": "Humidity",
+      "CO2": "CO₂",
+      "PM1_0": "PM 1.0",
+      "PM2_5": "PM 2.5",
+      "PM10": "PM 10",
+      "TEMPERATURE": "Temperature"
+    },
+    "NO_READINGS": "No real-time sensor readings available.",
+    "HISTORICAL_TITLE": "Historical Environmental Data",
+    "HISTORICAL_SUBTITLE": "Track air pollutant metrics and trends over selected timeframes",
+    "TIMEFRAME": {
+      "LAST_24_HOURS": "Last 24 Hours",
+      "LAST_7_DAYS": "Last 7 Days",
+      "LAST_30_DAYS": "Last 30 Days",
+      "LAST_YEAR": "Last Year"
+    },
+    "CUSTOM_RANGE": "Custom Range",
+    "TO": "to",
+    "APPLY_FILTER": "Apply Filter",
+    "METRIC_LABEL": "Metric:",
+    "AUTH_PROMPT": {
+      "TITLE": "Authentication Required",
+      "SUBTITLE": "Unlock full historical analysis",
+      "DESC": "Access to <strong>Last Year</strong> historical data and <strong>Custom Date Range Pickers</strong> is reserved for registered users and administrators. Please log in or create an account to proceed.",
+      "LOGIN_BTN": "Log In",
+      "REGISTER_BTN": "Create Account",
+      "CANCEL_BTN": "Cancel"
+    }
   },
   "COMMON": {
     "LOADING": "Loading...",

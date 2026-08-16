@@ -74,11 +74,49 @@
     "ROLE_REGISTERED_USER": "Usuario Registrado"
   },
   "DASHBOARD": {
+    "SYSTEM_TITLE": "Sistema de Monitoreo de Calidad del Aire",
+    "ANONYMOUS_TITLE": "Panel de Calidad del Aire",
+    "ANONYMOUS_SUBTITLE": "Monitoreo ambiental en tiempo real y métricas de calidad del aire en nodos sensores activos.",
     "WELCOME": "¡Bienvenido de nuevo, {{name}}!",
     "ROLE_INFO": "Has iniciado sesión como {{role}}.",
     "QUICK_ACTIONS": "Acciones Rápidas",
     "VIEW_PROFILE": "Gestionar Perfil",
-    "MANAGE_USERS": "Panel de Gestión de Usuarios"
+    "MANAGE_USERS": "Panel de Gestión de Usuarios",
+    "REAL_TIME_TITLE": "Calidad del Aire en Tiempo Real",
+    "REAL_TIME_SUBTITLE": "Lecturas de telemetría en vivo desde nodos de monitoreo activos",
+    "DEVICE_LABEL": "Dispositivo:",
+    "ALL_DEVICES": "Todos los Dispositivos",
+    "NODE_PREFIX": "Nodo:",
+    "METRICS": {
+      "TEMP": "Temp",
+      "HUMIDITY": "Humedad",
+      "CO2": "CO₂",
+      "PM1_0": "PM 1.0",
+      "PM2_5": "PM 2.5",
+      "PM10": "PM 10",
+      "TEMPERATURE": "Temperatura"
+    },
+    "NO_READINGS": "No hay lecturas de sensores en tiempo real disponibles.",
+    "HISTORICAL_TITLE": "Datos Ambientales Históricos",
+    "HISTORICAL_SUBTITLE": "Monitorea las métricas y tendencias de contaminantes del aire en diferentes períodos",
+    "TIMEFRAME": {
+      "LAST_24_HOURS": "Últimas 24 Horas",
+      "LAST_7_DAYS": "Últimos 7 Días",
+      "LAST_30_DAYS": "Últimos 30 Días",
+      "LAST_YEAR": "Último Año"
+    },
+    "CUSTOM_RANGE": "Rango Personalizado",
+    "TO": "a",
+    "APPLY_FILTER": "Aplicar Filtro",
+    "METRIC_LABEL": "Métrica:",
+    "AUTH_PROMPT": {
+      "TITLE": "Autenticación Requerida",
+      "SUBTITLE": "Desbloquea el análisis histórico completo",
+      "DESC": "El acceso a datos históricos del <strong>Último Año</strong> y el <strong>Selector de Rango de Fechas Personalizado</strong> está reservado para usuarios registrados y administradores. Por favor inicia sesión o crea una cuenta para continuar.",
+      "LOGIN_BTN": "Iniciar Sesión",
+      "REGISTER_BTN": "Crear Cuenta",
+      "CANCEL_BTN": "Cancelar"
+    }
   },
   "COMMON": {
     "LOADING": "Cargando...",

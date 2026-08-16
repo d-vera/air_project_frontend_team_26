@@ -32,20 +32,20 @@ import { LoginPromptModalComponent } from '../../shared/components/login-prompt-
       <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-sky-500 via-cyan-500 to-teal-500 text-white p-6 sm:p-8 shadow-xl shadow-sky-500/20">
         <div class="relative z-10">
           <span class="inline-block px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-semibold uppercase tracking-wider mb-3">
-            Air Quality Monitoring System
+            {{ 'DASHBOARD.SYSTEM_TITLE' | translate }}
           </span>
           <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight">
             @if (authService.isAuthenticated()) {
               {{ 'DASHBOARD.WELCOME' | translate:{ name: user()?.firstName || authService.getUserEmail() } }}
             } @else {
-              Air Quality Dashboard
+              {{ 'DASHBOARD.ANONYMOUS_TITLE' | translate }}
             }
           </h1>
           <p class="mt-2 text-sky-100 text-sm sm:text-base max-w-2xl">
             @if (authService.isAuthenticated()) {
               {{ 'DASHBOARD.ROLE_INFO' | translate:{ role: (authService.isAdmin() ? 'ADMIN.ROLE_ADMIN' : 'ADMIN.ROLE_REGISTERED_USER') | translate } }}
             } @else {
-              Real-time environmental monitoring & air quality metrics across active sensor nodes.
+              {{ 'DASHBOARD.ANONYMOUS_SUBTITLE' | translate }}
             }
           </p>
         </div>
