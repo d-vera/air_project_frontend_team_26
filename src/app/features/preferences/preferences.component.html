@@ -186,16 +186,9 @@
           </svg>
         </div>
         <div>
-          <div class="flex items-center space-x-2">
-            <h3 class="text-base font-bold text-slate-900 dark:text-slate-100">
-              {{ 'PREFERENCES.ACTIVE_LABEL' | translate }}
-            </h3>
-            @if (preferenceId()) {
-              <span class="px-2 py-0.5 text-xs font-semibold rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
-                ID: #{{ preferenceId() }}
-              </span>
-            }
-          </div>
+          <h3 class="text-base font-bold text-slate-900 dark:text-slate-100">
+            {{ 'PREFERENCES.ACTIVE_LABEL' | translate }}
+          </h3>
           <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
             {{ 'PREFERENCES.ACTIVE_DESC' | translate }}
           </p>
