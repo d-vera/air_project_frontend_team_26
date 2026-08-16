@@ -37,8 +37,15 @@ export class AirQualityService {
     if (query.deviceId && query.deviceId.trim().length > 0) {
       params = params.set('deviceId', query.deviceId.trim());
     }
-    if (query.rangeShortcut) {
-      params = params.set('range', query.rangeShortcut);
+    if (query.rangeShortcut && query.rangeShortcut !== 'custom') {
+      const rangeMap: Record<string, string> = {
+        '24h': 'LAST_DAY',
+        '7d': 'LAST_WEEK',
+        '30d': 'LAST_MONTH',
+        '1y': 'LAST_YEAR'
+      };
+      const backendRange = rangeMap[query.rangeShortcut] || query.rangeShortcut;
+      params = params.set('range', backendRange);
     }
     if (query.from) {
       params = params.set('from', query.from);

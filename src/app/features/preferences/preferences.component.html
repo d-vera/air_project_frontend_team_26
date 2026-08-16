@@ -1,0 +1,217 @@
+<div class="max-w-4xl mx-auto space-y-6">
+  <!-- Header Banner -->
+  <div class="bg-gradient-to-r from-sky-600 via-indigo-600 to-purple-600 rounded-2xl p-6 sm:p-8 text-white shadow-lg relative overflow-hidden">
+    <div class="absolute -right-6 -bottom-6 w-32 h-32 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
+    <div class="relative z-10">
+      <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">
+        {{ 'PREFERENCES.TITLE' | translate }}
+      </h1>
+      <p class="mt-2 text-sky-100 text-sm sm:text-base max-w-xl">
+        {{ 'PREFERENCES.SUBTITLE' | translate }}
+      </p>
+    </div>
+  </div>
+
+  <!-- Notification Banners -->
+  @if (successMessage()) {
+    <div class="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 flex items-center space-x-3 transition-all animate-fade-in">
+      <svg class="w-5 h-5 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+      </svg>
+      <span class="text-sm font-medium">{{ successMessage()! | translate }}</span>
+    </div>
+  }
+
+  @if (errorMessage()) {
+    <div class="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-700 dark:text-rose-300 flex items-center space-x-3 transition-all">
+      <svg class="w-5 h-5 text-rose-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+      <span class="text-sm font-medium">{{ errorMessage()! | translate }}</span>
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="flex items-center justify-center p-12 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
+      <div class="flex items-center space-x-3 text-slate-500 dark:text-slate-400">
+        <svg class="w-6 h-6 animate-spin text-sky-500" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <span>{{ 'COMMON.LOADING' | translate }}</span>
+      </div>
+    </div>
+  } @else {
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      
+      <!-- Theme Selection Card -->
+      <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-800 space-y-4">
+        <div class="flex items-center space-x-3">
+          <div class="p-2.5 bg-amber-500/10 text-amber-500 rounded-xl">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+            </svg>
+          </div>
+          <div>
+            <h2 class="text-lg font-bold text-slate-900 dark:text-slate-100">
+              {{ 'PREFERENCES.THEME_SETTING' | translate }}
+            </h2>
+            <p class="text-xs text-slate-500 dark:text-slate-400">
+              SYSTEM mode dynamically follows OS preference
+            </p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3 pt-2">
+          <!-- System Theme Option -->
+          <button
+            (click)="onSelectTheme('SYSTEM')"
+            type="button"
+            [class.ring-2]="themeService.themeMode() === 'SYSTEM'"
+            [class.ring-sky-500]="themeService.themeMode() === 'SYSTEM'"
+            [class.bg-sky-500\/10]="themeService.themeMode() === 'SYSTEM'"
+            [class.border-sky-500]="themeService.themeMode() === 'SYSTEM'"
+            class="flex flex-col items-center justify-center p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all cursor-pointer text-center"
+          >
+            <svg class="w-6 h-6 text-slate-600 dark:text-slate-300 mb-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+            </svg>
+            <span class="text-xs font-semibold text-slate-800 dark:text-slate-200">
+              SYSTEM
+            </span>
+          </button>
+
+          <!-- Dark Mode Option -->
+          <button
+            (click)="onSelectTheme('DARK')"
+            type="button"
+            [class.ring-2]="themeService.themeMode() === 'DARK'"
+            [class.ring-sky-500]="themeService.themeMode() === 'DARK'"
+            [class.bg-sky-500\/10]="themeService.themeMode() === 'DARK'"
+            [class.border-sky-500]="themeService.themeMode() === 'DARK'"
+            class="flex flex-col items-center justify-center p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all cursor-pointer text-center"
+          >
+            <svg class="w-6 h-6 text-slate-600 dark:text-slate-300 mb-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+            </svg>
+            <span class="text-xs font-semibold text-slate-800 dark:text-slate-200">
+              DARK
+            </span>
+          </button>
+
+          <!-- Light Mode Option -->
+          <button
+            (click)="onSelectTheme('LIGHT')"
+            type="button"
+            [class.ring-2]="themeService.themeMode() === 'LIGHT'"
+            [class.ring-sky-500]="themeService.themeMode() === 'LIGHT'"
+            [class.bg-sky-500\/10]="themeService.themeMode() === 'LIGHT'"
+            [class.border-sky-500]="themeService.themeMode() === 'LIGHT'"
+            class="flex flex-col items-center justify-center p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all cursor-pointer text-center"
+          >
+            <svg class="w-6 h-6 text-amber-500 mb-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+            </svg>
+            <span class="text-xs font-semibold text-slate-800 dark:text-slate-200">
+              LIGHT
+            </span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Language Selection Card -->
+      <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-800 space-y-4">
+        <div class="flex items-center space-x-3">
+          <div class="p-2.5 bg-sky-500/10 text-sky-500 rounded-xl">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/>
+            </svg>
+          </div>
+          <div>
+            <h2 class="text-lg font-bold text-slate-900 dark:text-slate-100">
+              {{ 'PREFERENCES.LANGUAGE_SETTING' | translate }}
+            </h2>
+            <p class="text-xs text-slate-500 dark:text-slate-400">
+              Select runtime language format (ES / EN)
+            </p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 pt-2">
+          <!-- Spanish ES Button -->
+          <button
+            (click)="onSelectLanguage('ES')"
+            type="button"
+            [class.ring-2]="languageService.currentLangPreference() === 'ES'"
+            [class.ring-sky-500]="languageService.currentLangPreference() === 'ES'"
+            [class.bg-sky-500\/10]="languageService.currentLangPreference() === 'ES'"
+            [class.border-sky-500]="languageService.currentLangPreference() === 'ES'"
+            class="flex items-center space-x-3 p-4 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all cursor-pointer"
+          >
+            <span class="text-2xl">🇪🇸</span>
+            <div class="text-left">
+              <span class="block text-sm font-bold text-slate-900 dark:text-slate-100">ES</span>
+              <span class="block text-xs text-slate-500 dark:text-slate-400">{{ 'COMMON.SPANISH' | translate }}</span>
+            </div>
+          </button>
+
+          <!-- English EN Button -->
+          <button
+            (click)="onSelectLanguage('EN')"
+            type="button"
+            [class.ring-2]="languageService.currentLangPreference() === 'EN'"
+            [class.ring-sky-500]="languageService.currentLangPreference() === 'EN'"
+            [class.bg-sky-500\/10]="languageService.currentLangPreference() === 'EN'"
+            [class.border-sky-500]="languageService.currentLangPreference() === 'EN'"
+            class="flex items-center space-x-3 p-4 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all cursor-pointer"
+          >
+            <span class="text-2xl">🇺🇸</span>
+            <div class="text-left">
+              <span class="block text-sm font-bold text-slate-900 dark:text-slate-100">EN</span>
+              <span class="block text-xs text-slate-500 dark:text-slate-400">{{ 'COMMON.ENGLISH' | translate }}</span>
+            </div>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Preferences Active Toggle Card -->
+    <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div class="flex items-start space-x-3">
+        <div class="p-2.5 bg-indigo-500/10 text-indigo-500 rounded-xl shrink-0 mt-0.5">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+          </svg>
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <h3 class="text-base font-bold text-slate-900 dark:text-slate-100">
+              {{ 'PREFERENCES.ACTIVE_LABEL' | translate }}
+            </h3>
+            @if (preferenceId()) {
+              <span class="px-2 py-0.5 text-xs font-semibold rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+                ID: #{{ preferenceId() }}
+              </span>
+            }
+          </div>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+            {{ 'PREFERENCES.ACTIVE_DESC' | translate }}
+          </p>
+        </div>
+      </div>
+
+      <label class="relative inline-flex items-center cursor-pointer shrink-0">
+        <input
+          type="checkbox"
+          [checked]="activeStatus()"
+          (change)="onToggleActive($event)"
+          [disabled]="saving()"
+          class="sr-only peer"
+        />
+        <div class="w-14 h-7 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all dark:after:border-slate-600 peer-checked:bg-sky-600"></div>
+      </label>
+    </div>
+  }
+</div>

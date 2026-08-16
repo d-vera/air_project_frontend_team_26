@@ -4,8 +4,9 @@ import { Observable, tap } from 'rxjs';
 import { LoginRequest, RegisterRequest, AuthResponse } from '../../models/auth.model';
 import { UserRole } from '../../models/user.model';
 import { UserService } from './user.service';
-import { ThemeService, Theme } from './theme.service';
+import { ThemeService, ThemeMode } from './theme.service';
 import { LanguageService } from './language.service';
+import { UserPreferenceService } from './user-preference.service';
 
 @Injectable({
   providedIn: 'root'
@@ -74,18 +75,17 @@ export class AuthService {
   loadUserPreferences(): void {
     if (!this.isAuthenticated()) return;
 
-    const userService = this.injector.get(UserService);
+    const preferenceService = this.injector.get(UserPreferenceService);
     const themeService = this.injector.get(ThemeService);
     const languageService = this.injector.get(LanguageService);
 
-    userService.getMe().subscribe({
-      next: (user) => {
-        if (user.preferredTheme) {
-          const theme: Theme = user.preferredTheme === 'DARK' ? 'dark' : 'light';
-          themeService.setTheme(theme, false);
+    preferenceService.getPreferences().subscribe({
+      next: (pref) => {
+        if (pref.theme) {
+          themeService.setThemeMode(pref.theme, false);
         }
-        if (user.preferredLanguage) {
-          languageService.setLanguage(user.preferredLanguage, false);
+        if (pref.language) {
+          languageService.setLanguage(pref.language, false);
         }
       },
       error: (err) => {

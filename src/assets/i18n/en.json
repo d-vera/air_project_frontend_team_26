@@ -6,6 +6,7 @@
   "NAV": {
     "DASHBOARD": "Dashboard",
     "PROFILE": "My Profile",
+    "PREFERENCES": "Preferences",
     "ADMIN_USERS": "Manage Users",
     "LOGOUT": "Log Out",
     "LOGIN": "Log In",
@@ -88,5 +89,19 @@
     "SPANISH": "Spanish",
     "ENGLISH": "English",
     "SYSTEM_THEME": "System Theme"
+  },
+  "PREFERENCES": {
+    "TITLE": "User Preferences",
+    "SUBTITLE": "Customize language, visual theme, and preference settings for your account",
+    "THEME_SETTING": "Visual Theme",
+    "THEME_SYSTEM": "System (Auto)",
+    "THEME_DARK": "Dark",
+    "THEME_LIGHT": "Light",
+    "LANGUAGE_SETTING": "Interface Language",
+    "ACTIVE_SETTING": "Preference Status",
+    "ACTIVE_LABEL": "Preferences Active",
+    "ACTIVE_DESC": "Keep synchronization active for custom settings",
+    "SAVE_SUCCESS": "Preferences saved successfully!",
+    "SAVE_ERROR": "Failed to save preferences. Please try again."
   }
 }

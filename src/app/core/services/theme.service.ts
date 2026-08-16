@@ -1,54 +1,106 @@
 import { Injectable, signal, inject } from '@angular/core';
-import { UserService } from './user.service';
-import { PreferredTheme } from '../../models/user.model';
+import { UserPreferenceService } from './user-preference.service';
+import { ThemePreference } from '../../models/user-preference.model';
 
-export type Theme = 'light' | 'dark';
+export type ThemeMode = ThemePreference; // 'DARK' | 'LIGHT' | 'SYSTEM'
+export type LegacyTheme = 'light' | 'dark';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ThemeService {
   private readonly THEME_KEY = 'theme';
-  private userService = inject(UserService);
+  private preferenceService = inject(UserPreferenceService);
 
-  isDarkMode = signal<boolean>(this.initialDarkMode());
+  themeMode = signal<ThemeMode>(this.initialThemeMode());
+  isDarkMode = signal<boolean>(false);
+
+  private mediaQuery = typeof window !== 'undefined' && window.matchMedia
+    ? window.matchMedia('(prefers-color-scheme: dark)')
+    : null;
+
+  private mediaQueryListener = (e: MediaQueryListEvent) => {
+    if (this.themeMode() === 'SYSTEM') {
+      this.applyDarkMode(e.matches);
+    }
+  };
 
   constructor() {
-    this.applyTheme(this.isDarkMode());
+    if (this.mediaQuery) {
+      if (this.mediaQuery.addEventListener) {
+        this.mediaQuery.addEventListener('change', this.mediaQueryListener);
+      } else {
+        // Fallback for older browsers
+        this.mediaQuery.addListener(this.mediaQueryListener);
+      }
+    }
+    this.updateThemeRendering(this.themeMode());
   }
 
-  toggleTheme(syncBackend = true): void {
-    const newMode = !this.isDarkMode();
-    this.setTheme(newMode ? 'dark' : 'light', syncBackend);
-  }
-
-  setTheme(theme: Theme, syncBackend = true): void {
-    const isDark = theme === 'dark';
-    this.isDarkMode.set(isDark);
-    localStorage.setItem(this.THEME_KEY, theme);
-    this.applyTheme(isDark);
+  setThemeMode(mode: ThemeMode, syncBackend = true): void {
+    this.themeMode.set(mode);
+    localStorage.setItem(this.THEME_KEY, mode);
+    this.updateThemeRendering(mode);
 
     if (syncBackend && this.isAuthenticated()) {
-      const preferredTheme: PreferredTheme = isDark ? 'DARK' : 'LIGHT';
-      this.userService.updatePreferredTheme(preferredTheme).subscribe({
+      this.preferenceService.updatePreferences({ theme: mode }).subscribe({
         error: (err) => console.warn('Failed to sync theme preference to backend:', err)
       });
     }
+  }
+
+  // Legacy helper method for simple toggling
+  toggleTheme(syncBackend = true): void {
+    const current = this.themeMode();
+    let nextMode: ThemeMode;
+    if (current === 'LIGHT') {
+      nextMode = 'DARK';
+    } else if (current === 'DARK') {
+      nextMode = 'SYSTEM';
+    } else {
+      nextMode = 'LIGHT';
+    }
+    this.setThemeMode(nextMode, syncBackend);
+  }
+
+  setTheme(theme: LegacyTheme, syncBackend = true): void {
+    const mode: ThemeMode = theme === 'dark' ? 'DARK' : 'LIGHT';
+    this.setThemeMode(mode, syncBackend);
   }
 
   private isAuthenticated(): boolean {
     return !!localStorage.getItem('auth_token');
   }
 
-  private initialDarkMode(): boolean {
+  private initialThemeMode(): ThemeMode {
     const savedTheme = localStorage.getItem(this.THEME_KEY);
-    if (savedTheme) {
-      return savedTheme === 'dark';
+    if (savedTheme === 'DARK' || savedTheme === 'dark') {
+      return 'DARK';
     }
-    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (savedTheme === 'LIGHT' || savedTheme === 'light') {
+      return 'LIGHT';
+    }
+    if (savedTheme === 'SYSTEM') {
+      return 'SYSTEM';
+    }
+    return 'SYSTEM';
   }
 
-  private applyTheme(isDark: boolean): void {
+  private updateThemeRendering(mode: ThemeMode): void {
+    let effectiveDark = false;
+    if (mode === 'DARK') {
+      effectiveDark = true;
+    } else if (mode === 'LIGHT') {
+      effectiveDark = false;
+    } else {
+      // SYSTEM mode: check window.matchMedia
+      effectiveDark = this.mediaQuery ? this.mediaQuery.matches : false;
+    }
+    this.applyDarkMode(effectiveDark);
+  }
+
+  private applyDarkMode(isDark: boolean): void {
+    this.isDarkMode.set(isDark);
     if (isDark) {
       document.documentElement.classList.add('dark');
     } else {
