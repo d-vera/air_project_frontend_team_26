@@ -25,9 +25,16 @@ import { AuthService } from '../../../core/services/auth.service';
           </svg>
         </button>
 
-        <h2 class="text-lg font-bold text-slate-900 dark:text-slate-100">
-          {{ 'APP.NAME' | translate }}
-        </h2>
+        <div class="flex items-center space-x-3">
+          <img
+            src="assets/images/logo.jpg"
+            alt="Project Aeolus Logo"
+            class="w-9 h-9 rounded-full object-cover shadow-sm border border-slate-200 dark:border-slate-700/80 md:hidden"
+          />
+          <h2 class="text-lg font-bold text-slate-900 dark:text-slate-100 tracking-tight">
+            Project Aeolus
+          </h2>
+        </div>
       </div>
 
       <!-- Right Header Actions -->

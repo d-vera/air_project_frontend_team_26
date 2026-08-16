@@ -26,15 +26,18 @@ import { LanguageToggleComponent } from '../../../shared/components/language-tog
         <app-theme-toggle></app-theme-toggle>
       </div>
 
-      <div class="sm:mx-auto sm:w-full sm:max-w-md">
+      <div class="sm:mx-auto sm:w-full sm:max-w-md flex flex-col items-center">
         <!-- Logo Icon -->
-        <div class="flex justify-center">
-          <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-sky-500 to-cyan-400 flex items-center justify-center text-white text-2xl font-bold shadow-xl shadow-sky-500/25">
-            A
-          </div>
+        <div class="relative flex justify-center items-center">
+          <div class="absolute inset-0 bg-gradient-to-tr from-sky-500/30 to-indigo-500/30 rounded-full blur-xl transform scale-110"></div>
+          <img
+            src="assets/images/logo.jpg"
+            alt="Project Aeolus Logo"
+            class="relative w-36 h-36 sm:w-40 sm:h-40 rounded-full object-cover shadow-2xl border-2 border-slate-700/50 dark:border-slate-700"
+          />
         </div>
 
-        <h2 class="mt-4 text-center text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
+        <h2 class="mt-6 text-center text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
           {{ 'AUTH.LOGIN_TITLE' | translate }}
         </h2>
         <p class="mt-2 text-center text-xs sm:text-sm text-slate-500 dark:text-slate-400">

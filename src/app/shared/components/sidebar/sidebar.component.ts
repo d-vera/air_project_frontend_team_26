@@ -13,27 +13,33 @@ import { LanguageToggleComponent } from '../language-toggle/language-toggle.comp
   imports: [CommonModule, RouterModule, TranslatePipe, ThemeToggleComponent, LanguageToggleComponent],
   template: `
     <aside class="flex flex-col h-full bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 w-64 transition-all">
-      <!-- App Header / Logo -->
-      <div class="h-16 flex items-center justify-between px-6 border-b border-slate-200 dark:border-slate-800">
-        <div class="flex items-center space-x-3">
-          <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-sky-500 to-cyan-400 flex items-center justify-center text-white shadow-md shadow-sky-500/20 font-bold text-lg">
-            A
-          </div>
-          <div>
-            <h1 class="font-bold text-slate-900 dark:text-slate-100 text-base leading-tight">Air Project</h1>
-            <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">{{ 'APP.USER_MANAGEMENT' | translate }}</p>
-          </div>
+      <!-- App Header / Logo Showcase -->
+      <div class="p-5 border-b border-slate-200 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-950/40">
+        <div class="flex items-center justify-between md:hidden mb-3">
+          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Menú</span>
+          <button
+            (click)="closeSidebar.emit()"
+            type="button"
+            class="p-1.5 rounded-lg text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
 
-        <button
-          (click)="closeSidebar.emit()"
-          type="button"
-          class="md:hidden p-1.5 rounded-lg text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
-        >
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
+        <div class="flex flex-col items-center text-center">
+          <div class="relative group cursor-pointer mb-3">
+            <div class="absolute inset-0 bg-gradient-to-tr from-sky-500/25 to-indigo-500/25 rounded-full blur-md group-hover:blur-lg transition-all"></div>
+            <img
+              src="assets/images/logo.jpg"
+              alt="Project Aeolus Logo"
+              class="relative w-20 h-20 rounded-full object-cover shadow-xl border-2 border-slate-200/80 dark:border-slate-700/90 transition-transform duration-300 group-hover:scale-105"
+            />
+          </div>
+          <h1 class="font-extrabold text-slate-900 dark:text-slate-100 text-lg leading-snug tracking-tight">Project Aeolus</h1>
+          <p class="text-[11px] text-sky-600 dark:text-sky-400 font-semibold tracking-wider uppercase mt-0.5">{{ 'APP.USER_MANAGEMENT' | translate }}</p>
+        </div>
       </div>
 
       <!-- User Information Badge -->
