@@ -12,7 +12,7 @@
 ## 3. Admin Sensor Management UI
 
 - [x] 3.1 Create `SensorManagementComponent` under admin routing with tabular list, status badges, and search/status filter controls
-- [x] 3.2 Create `SensorDialogComponent` (Create/Edit modal) integrating form validation, user assignment selector, and coordinate picker
+- [x] 3.2 Create `SensorDialogComponent` (Create/Edit modal) integrating form validation and coordinate picker
 - [x] 3.3 Add delete confirmation dialog with soft-delete action handling and toast notifications
 - [x] 3.4 Configure admin navigation menu items and RBAC route guards for `/admin/sensors`
 

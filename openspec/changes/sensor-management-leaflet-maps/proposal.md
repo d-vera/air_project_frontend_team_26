@@ -11,7 +11,7 @@ The backend has implemented the `Sensor` domain, hardware tracking (`uidSensor`)
 - **Admin Sensor Management Views**:
   - Sensor list with filtering, searching (by UID, name, status), and tabular views.
   - Interactive map view showing physical sensor locations and status overlays.
-  - Modal / Form dialog for creating and updating sensor metadata, coordinates, and assigned user.
+  - Modal / Form dialog for creating and updating sensor metadata and coordinates.
   - Coordinate picker allowing administrators to click or drag markers on Leaflet maps or input lat/long manually.
   - Deletion / deactivation confirmation dialogs with soft-delete support.
 - **Navigation & RBAC Routing**: Add routes for Sensor Management accessible by `ADMIN` roles, and integrate sensor status displays into the dashboard map view.
@@ -19,7 +19,7 @@ The backend has implemented the `Sensor` domain, hardware tracking (`uidSensor`)
 ## Capabilities
 
 ### New Capabilities
-- `sensor-management`: Management of sensor devices including CRUD operations, hardware UID tracking, user assignment, health status transitions, and administrative table/dialog workflows.
+- `sensor-management`: Management of sensor devices including CRUD operations, hardware UID tracking, health status transitions, and administrative table/dialog workflows (creator user ID captured automatically upon registration).
 - `interactive-map-integration`: Interactive Leaflet map component displaying sensor station markers with status color-coding, coordinate selection picker, popups, and map controls.
 
 ### Modified Capabilities

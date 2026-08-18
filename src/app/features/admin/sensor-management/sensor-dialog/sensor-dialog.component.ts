@@ -3,8 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 import { Sensor, SensorStatus, CreateSensorRequest, UpdateSensorRequest } from '../../../../models/sensor.model';
-import { UserResponse } from '../../../../models/user.model';
-import { UserService } from '../../../../core/services/user.service';
 import { MapCoordinatePickerComponent } from '../../../../shared/components/map-coordinate-picker/map-coordinate-picker.component';
 
 @Component({
@@ -122,22 +120,6 @@ import { MapCoordinatePickerComponent } from '../../../../shared/components/map-
             </div>
           </div>
 
-          <!-- Assigned User -->
-          <div>
-            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
-              {{ 'SENSOR.ASSIGNED_USER' | translate }}
-            </label>
-            <select
-              formControlName="userId"
-              class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
-            >
-              <option [ngValue]="null">-- None / Unassigned --</option>
-              <option *ngFor="let u of users" [ngValue]="u.id">
-                {{ u.firstName }} {{ u.lastName }} ({{ u.email }})
-              </option>
-            </select>
-          </div>
-
           <!-- Coordinates & Interactive Map Picker -->
           <div class="space-y-3 pt-2 border-t border-slate-100 dark:border-slate-800">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -205,10 +187,8 @@ export class SensorDialogComponent implements OnInit {
   @Output() cancel = new EventEmitter<void>();
 
   private fb = inject(FormBuilder);
-  private userService = inject(UserService);
 
   sensorForm!: FormGroup;
-  users: UserResponse[] = [];
   isSubmitting = false;
 
   get isEditMode(): boolean {
@@ -217,7 +197,6 @@ export class SensorDialogComponent implements OnInit {
 
   ngOnInit(): void {
     this.initForm();
-    this.loadUsers();
   }
 
   private initForm(): void {
@@ -227,20 +206,8 @@ export class SensorDialogComponent implements OnInit {
       sensorType: [this.sensor?.sensorType || 'ESP32_AIR'],
       firmwareVersion: [this.sensor?.firmwareVersion || '1.0.0'],
       sensorStatus: [this.sensor?.sensorStatus || 'ONLINE'],
-      userId: [this.sensor?.userId ?? null],
       latitude: [this.sensor?.latitude ?? -12.046374, [Validators.required]],
       longitude: [this.sensor?.longitude ?? -77.042793, [Validators.required]]
-    });
-  }
-
-  private loadUsers(): void {
-    this.userService.getAllUsers().subscribe({
-      next: (users) => {
-        this.users = users;
-      },
-      error: () => {
-        this.users = [];
-      }
     });
   }
 
@@ -263,8 +230,7 @@ export class SensorDialogComponent implements OnInit {
         latitude: Number(rawValues.latitude),
         longitude: Number(rawValues.longitude),
         firmwareVersion: rawValues.firmwareVersion,
-        sensorStatus: rawValues.sensorStatus,
-        userId: rawValues.userId !== null ? Number(rawValues.userId) : null
+        sensorStatus: rawValues.sensorStatus
       };
       this.save.emit(updatePayload);
     } else {
@@ -274,8 +240,7 @@ export class SensorDialogComponent implements OnInit {
         sensorType: rawValues.sensorType,
         latitude: Number(rawValues.latitude),
         longitude: Number(rawValues.longitude),
-        firmwareVersion: rawValues.firmwareVersion,
-        userId: rawValues.userId !== null ? Number(rawValues.userId) : null
+        firmwareVersion: rawValues.firmwareVersion
       };
       this.save.emit(createPayload);
     }

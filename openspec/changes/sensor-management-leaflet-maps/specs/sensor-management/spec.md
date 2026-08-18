@@ -8,11 +8,11 @@ The system SHALL provide administrative functionality to view, create, update, a
 - **THEN** the system requests `GET /api/sensors` and displays a table of active sensors including UID, station name, type, coordinates, firmware version, connectivity status, assigned user ID, and last seen timestamp.
 
 #### Scenario: Admin creates a new sensor
-- **WHEN** an administrator submits the sensor registration form with UID, name, coordinates (latitude, longitude), firmware version, and optional assigned user
-- **THEN** the system sends `POST /api/sensors` with `CreateSensorRequest` and adds the new sensor to the list upon receiving a 201 response.
+- **WHEN** an administrator submits the sensor registration form with UID, name, coordinates (latitude, longitude), and firmware version
+- **THEN** the system sends `POST /api/sensors` with `CreateSensorRequest` (backend associates the sensor to the authenticated registering user) and adds the new sensor to the list upon receiving a 201 response.
 
 #### Scenario: Admin updates an existing sensor
-- **WHEN** an administrator modifies the name, coordinates, status (`ONLINE`, `OFFLINE`, `MAINTENANCE`), firmware version, or assigned user of a sensor and saves
+- **WHEN** an administrator modifies the name, coordinates, status (`ONLINE`, `OFFLINE`, `MAINTENANCE`), or firmware version of a sensor and saves
 - **THEN** the system sends `PUT /api/sensors/{id}` with `UpdateSensorRequest` and refreshes the sensor record.
 
 #### Scenario: Admin deletes a sensor
