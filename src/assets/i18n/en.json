@@ -138,9 +138,6 @@
     "THEME_DARK": "Dark",
     "THEME_LIGHT": "Light",
     "LANGUAGE_SETTING": "Interface Language",
-    "ACTIVE_SETTING": "Preference Status",
-    "ACTIVE_LABEL": "Preferences Active",
-    "ACTIVE_DESC": "Keep synchronization active for custom settings",
     "SAVE_SUCCESS": "Preferences saved successfully!",
     "SAVE_ERROR": "Failed to save preferences. Please try again."
   },

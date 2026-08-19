@@ -138,9 +138,6 @@
     "THEME_DARK": "Oscuro",
     "THEME_LIGHT": "Claro",
     "LANGUAGE_SETTING": "Idioma de la Interfaz",
-    "ACTIVE_SETTING": "Estado de Preferencia",
-    "ACTIVE_LABEL": "Preferencias Activas",
-    "ACTIVE_DESC": "Mantener la sincronización activa de preferencias personalizadas",
     "SAVE_SUCCESS": "¡Preferencias guardadas con éxito!",
     "SAVE_ERROR": "Error al guardar las preferencias. Inténtalo nuevamente."
   },

@@ -4,7 +4,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { UserPreferenceService } from '../../core/services/user-preference.service';
 import { ThemeService, ThemeMode } from '../../core/services/theme.service';
 import { LanguageService } from '../../core/services/language.service';
-import { LanguagePreference, UserPreference } from '../../models/user-preference.model';
+import { Language, Theme, PreferenceResponse } from '../../models/user-preference.model';
 
 @Component({
   selector: 'app-preferences',
@@ -20,7 +20,6 @@ export class PreferencesComponent implements OnInit {
 
   loading = signal<boolean>(true);
   saving = signal<boolean>(false);
-  activeStatus = signal<boolean>(true);
   preferenceId = signal<number | null>(null);
   successMessage = signal<string | null>(null);
   errorMessage = signal<string | null>(null);
@@ -34,9 +33,8 @@ export class PreferencesComponent implements OnInit {
     this.errorMessage.set(null);
 
     this.preferenceService.getPreferences().subscribe({
-      next: (pref: UserPreference) => {
+      next: (pref: PreferenceResponse) => {
         this.preferenceId.set(pref.id);
-        this.activeStatus.set(pref.active);
 
         if (pref.theme) {
           this.themeService.setThemeMode(pref.theme, false);
@@ -59,30 +57,10 @@ export class PreferencesComponent implements OnInit {
     this.showSuccess('PREFERENCES.SAVE_SUCCESS');
   }
 
-  onSelectLanguage(lang: LanguagePreference): void {
+  onSelectLanguage(lang: Language): void {
     if (this.languageService.currentLangPreference() === lang) return;
     this.languageService.setLanguage(lang, true);
     this.showSuccess('PREFERENCES.SAVE_SUCCESS');
-  }
-
-  onToggleActive(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const isChecked = input.checked;
-    this.activeStatus.set(isChecked);
-    this.saving.set(true);
-
-    this.preferenceService.updatePreferences({ active: isChecked }).subscribe({
-      next: (updated) => {
-        this.activeStatus.set(updated.active);
-        this.saving.set(false);
-        this.showSuccess('PREFERENCES.SAVE_SUCCESS');
-      },
-      error: (err) => {
-        console.error('Failed to update active state:', err);
-        this.saving.set(false);
-        this.errorMessage.set('PREFERENCES.SAVE_ERROR');
-      }
-    });
   }
 
   private showSuccess(msgKey: string): void {

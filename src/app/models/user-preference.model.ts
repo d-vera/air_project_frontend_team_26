@@ -1,15 +1,21 @@
-export type LanguagePreference = 'ES' | 'EN';
-export type ThemePreference = 'DARK' | 'LIGHT' | 'SYSTEM';
+export type Language = 'ES' | 'EN';
+export type Theme = 'DARK' | 'LIGHT' | 'SYSTEM';
 
-export interface UserPreference {
+// Compatibility aliases
+export type LanguagePreference = Language;
+export type ThemePreference = Theme;
+
+export interface PreferenceResponse {
   id: number;
-  language: LanguagePreference;
-  theme: ThemePreference;
-  active: boolean;
+  language: Language;
+  theme: Theme;
 }
 
-export interface UpdatePreferencePayload {
-  language?: LanguagePreference;
-  theme?: ThemePreference;
-  active?: boolean;
+export interface UpdatePreferenceRequest {
+  language?: Language;
+  theme?: Theme;
 }
+
+// Compatibility aliases
+export type UserPreference = PreferenceResponse;
+export type UpdatePreferencePayload = UpdatePreferenceRequest;
