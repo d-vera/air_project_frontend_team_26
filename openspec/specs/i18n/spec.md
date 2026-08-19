@@ -1,18 +1,20 @@
 # i18n Specification
 
 ## Purpose
-TBD - created by archiving change user-management-frontend. Update Purpose after archive.
+Manage runtime language switching and synchronization between frontend and backend.
+
 ## Requirements
+
 ### Requirement: User can switch between Spanish and English
-The system SHALL provide a language toggle in the sidebar/navbar that switches all UI text between Spanish and English at runtime without page reload.
+The system SHALL support Spanish (`ES`) and English (`EN`) preferences, dynamically switching runtime translations without page reload.
 
 #### Scenario: Switch to Spanish
-- **WHEN** a user selects Spanish from the language toggle
-- **THEN** the system loads `assets/i18n/es.json`, updates all visible text to Spanish, and saves `"es"` to localStorage under key `lang`
+- **WHEN** a user selects Spanish (`ES`)
+- **THEN** the system loads `assets/i18n/es.json`, updates UI text to Spanish, and saves `"es"` to `localStorage` under key `lang`
 
 #### Scenario: Switch to English
-- **WHEN** a user selects English from the language toggle
-- **THEN** the system loads `assets/i18n/en.json`, updates all visible text to English, and saves `"en"` to localStorage under key `lang`
+- **WHEN** a user selects English (`EN`)
+- **THEN** the system loads `assets/i18n/en.json`, updates UI text to English, and saves `"en"` to `localStorage` under key `lang`
 
 ### Requirement: Language preference persists across sessions
 The system SHALL remember the user's language choice by restoring `preferred_language` from the backend profile for authenticated users, falling back to `localStorage` and browser locale settings.
@@ -37,13 +39,14 @@ The system SHALL use translation keys via `{{ 'KEY' | translate }}` pipe or `Tra
 - **THEN** all visible text (labels, buttons, messages, placeholders, error messages) comes from translation files
 
 ### Requirement: Synchronize language preference with backend database
-The system SHALL synchronize the authenticated user's language preference (`es` or `en`) with the backend API via `PATCH /api/users/me/preferences`.
+The system SHALL synchronize the authenticated user's language preference (`ES` or `EN`) with the backend API via `PATCH /api/preferences/me`.
 
-#### Scenario: Authenticated user changes language
-- **WHEN** an authenticated user selects a new language from the language selector
-- **THEN** the system updates active UI language, saves language to `localStorage`, and sends a `PATCH /api/users/me/preferences` request to persist `preferredLanguage` in the backend database
+#### Scenario: Authenticated user updates language
+- **WHEN** an authenticated user selects a language preference
+- **THEN** the system updates runtime language translation, saves `lang` to `localStorage`, and sends `PATCH /api/preferences/me` with payload `{"language": "ES"}` or `{"language": "EN"}`
 
 #### Scenario: User logs in with saved backend language
 - **WHEN** a user successfully logs in
-- **THEN** the system fetches user profile preferences from `GET /api/users/me` and applies `preferredLanguage` (`es` or `en`) to the application and syncs `localStorage`
+- **THEN** the system fetches user profile preferences and applies `preferredLanguage` (`es` or `en`) to the application and syncs `localStorage`
+
 
