@@ -427,7 +427,7 @@ export class UserListComponent implements OnInit {
     const u = this.activateModalUser();
     if (!u) return;
 
-    this.userService.updateUser(u.id, { firstName: u.firstName, lastName: u.lastName }).subscribe({
+    this.userService.updateUser(u.id, { active: true }).subscribe({
       next: () => {
         this.toastMessage.set('ADMIN.USER_ACTIVATED');
         this.activateModalUser.set(null);

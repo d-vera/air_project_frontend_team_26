@@ -32,6 +32,7 @@ export interface UpdateUserRequest {
   firstName?: string;
   lastName?: string;
   password?: string;
+  active?: boolean;
 }
 
 export interface UpdatePreferencesRequest {
