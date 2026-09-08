@@ -1,7 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import {
+  AirQualityReading,
   CurrentAirQualityResponse,
   HistoricalAirQualityQuery,
   HistoricalAirQualityResponse
@@ -53,6 +54,30 @@ export class AirQualityService {
     if (query.to) {
       params = params.set('to', query.to);
     }
-    return this.http.get<HistoricalAirQualityResponse>(`${this.API_URL}/historical`, { params });
+    return this.http.get<any>(`${this.API_URL}/historical`, { params }).pipe(
+      map(res => {
+        if (!res) {
+          return { readings: [] };
+        }
+        if (Array.isArray(res.readings)) {
+          return res as HistoricalAirQualityResponse;
+        }
+        if (Array.isArray(res.data)) {
+          const readings: AirQualityReading[] = res.data.map((item: any) => ({
+            deviceId: item.deviceId || query.deviceId || '',
+            deviceName: query.deviceId || '',
+            time: item.bucket || item.time || new Date().toISOString(),
+            temperature: item.avgTemperature ?? item.temperature ?? 0,
+            humidity: item.avgHumidity ?? item.humidity ?? 0,
+            co2: item.avgCo2 ?? item.co2 ?? 0,
+            pm1_0: item.avgPm1_0 ?? item.pm1_0 ?? 0,
+            pm2_5: item.avgPm2_5 ?? item.pm2_5 ?? 0,
+            pm10: item.avgPm10 ?? item.pm10 ?? 0
+          }));
+          return { readings };
+        }
+        return { readings: [] };
+      })
+    );
   }
 }

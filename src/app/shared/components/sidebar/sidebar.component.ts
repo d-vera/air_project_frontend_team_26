@@ -106,6 +106,19 @@ import { LanguageToggleComponent } from '../language-toggle/language-toggle.comp
           <span>{{ 'NAV.PREFERENCES' | translate }}</span>
         </a>
 
+        <!-- Environmental Reports -->
+        <a
+          routerLink="/dashboard/reports"
+          routerLinkActive="bg-sky-500 text-white shadow-md shadow-sky-500/20 font-semibold"
+          (click)="closeSidebar.emit()"
+          class="flex items-center space-x-3 px-3 py-2.5 rounded-xl font-medium text-sm transition-all text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white group"
+        >
+          <svg class="w-5 h-5 text-slate-500 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
+          <span>{{ 'NAV.REPORTS' | translate }}</span>
+        </a>
+
         <!-- Admin Only: User Management -->
         @if (authService.isAdmin()) {
           <div class="pt-4 pb-1">

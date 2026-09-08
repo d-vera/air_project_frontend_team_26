@@ -1,0 +1,37 @@
+@media print {
+  /* Hide non-printable UI chrome */
+  aside,
+  header,
+  nav,
+  app-navbar,
+  app-sidebar,
+  app-report-filter-bar,
+  app-report-export-menu,
+  .no-print {
+    display: none !important;
+  }
+
+  /* Reset layout constraints for paper */
+  body,
+  main,
+  .print-container {
+    padding: 0 !important;
+    margin: 0 !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
+    width: 100% !important;
+    overflow: visible !important;
+  }
+
+  /* Force print page break rules */
+  .page-break {
+    page-break-before: always;
+  }
+
+  /* Keep cards and charts visually clean without shadows */
+  .rounded-3xl,
+  .rounded-2xl {
+    border-radius: 8px !important;
+    box-shadow: none !important;
+  }
+}
