@@ -80,10 +80,30 @@ Chart.register(
         </div>
       </div>
 
+      <!-- Primary Empty Notice Banner -->
+      @if (isPrimaryEmpty && hasComparisonData) {
+        <div class="flex items-center gap-2 text-xs text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 px-3.5 py-2.5 rounded-xl border border-amber-200 dark:border-amber-900/60">
+          <svg class="w-4 h-4 text-amber-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span>{{ 'REPORTS.PRIMARY_EMPTY_NOTICE' | translate }}</span>
+        </div>
+      }
+
       <!-- Chart Canvas Wrapper -->
-      <div class="relative w-full h-80 sm:h-96">
+      <div class="relative w-full h-80 sm:h-96" [class.hidden]="!hasAnyData">
         <canvas #chartCanvas></canvas>
       </div>
+
+      <!-- Empty State Container -->
+      @if (!hasAnyData) {
+        <div class="flex flex-col items-center justify-center h-80 sm:h-96 text-slate-400 dark:text-slate-500 bg-slate-50/50 dark:bg-slate-800/30 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800">
+          <svg class="w-10 h-10 mb-2 text-slate-300 dark:text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
+          <p class="text-sm font-medium text-slate-600 dark:text-slate-400">{{ 'REPORTS.CHART_NO_DATA' | translate }}</p>
+        </div>
+      }
 
       <!-- Threshold Note -->
       @if (thresholdNote) {
@@ -105,6 +125,18 @@ export class ReportTrendChartComponent implements AfterViewInit, OnChanges, OnDe
   readonly parameters = REPORT_PARAMETERS;
   selectedMetric: ReportParameter = 'pm2_5';
   private chart: Chart | null = null;
+
+  get isPrimaryEmpty(): boolean {
+    return !this.report?.primaryReadings || this.report.primaryReadings.length === 0;
+  }
+
+  get hasComparisonData(): boolean {
+    return !!(this.report?.comparisonReadings && this.report.comparisonReadings.length > 0);
+  }
+
+  get hasAnyData(): boolean {
+    return !this.isPrimaryEmpty || this.hasComparisonData;
+  }
 
   get thresholdNote(): string {
     switch (this.selectedMetric) {
@@ -150,6 +182,10 @@ export class ReportTrendChartComponent implements AfterViewInit, OnChanges, OnDe
       this.chart = null;
     }
 
+    if (!this.hasAnyData) {
+      return;
+    }
+
     const series = this.calculationService.prepareOverlaySeries(
       this.report.primaryReadings,
       this.report.comparisonReadings,
@@ -160,12 +196,30 @@ export class ReportTrendChartComponent implements AfterViewInit, OnChanges, OnDe
     const primaryLabel = this.report.primaryPeriodLabel || 'Primary Period';
     const compLabel = this.report.comparisonPeriodLabel || 'Comparison Period';
 
-    const labels = series.primaryPoints.map(p => p.label);
-    const primaryData = series.primaryPoints.map(p => p.value);
+    const hasPrimary = series.primaryPoints && series.primaryPoints.length > 0;
+    const hasComp = series.comparisonPoints && series.comparisonPoints.length > 0;
+
+    // Derive labels safely:
+    // 1. If primary has data, use primary labels (extended if comparison has more points)
+    // 2. If primary is empty, fallback to comparison labels
+    let labels: string[] = [];
+    if (hasPrimary) {
+      labels = series.primaryPoints.map(p => p.label);
+      if (hasComp && series.comparisonPoints!.length > labels.length) {
+        for (let i = labels.length; i < series.comparisonPoints!.length; i++) {
+          labels.push(series.comparisonPoints![i].label);
+        }
+      }
+    } else if (hasComp) {
+      labels = series.comparisonPoints!.map(p => p.label);
+    }
+
+    const datasets: ChartConfiguration<'line'>['data']['datasets'] = [];
 
     // Primary dataset
-    const datasets: ChartConfiguration<'line'>['data']['datasets'] = [
-      {
+    if (hasPrimary) {
+      const primaryData = series.primaryPoints.map(p => p.value);
+      datasets.push({
         label: `${primaryLabel} (${series.unit})`,
         data: primaryData,
         borderColor: '#0284c7', // Sky-600
@@ -175,12 +229,12 @@ export class ReportTrendChartComponent implements AfterViewInit, OnChanges, OnDe
         fill: true,
         pointRadius: primaryData.length > 50 ? 0 : 3,
         pointHoverRadius: 6
-      }
-    ];
+      });
+    }
 
     // Overlay comparison dataset if available
-    if (series.comparisonPoints && series.comparisonPoints.length > 0) {
-      const compData = series.comparisonPoints.map(p => p.value);
+    if (hasComp) {
+      const compData = series.comparisonPoints!.map(p => p.value);
       datasets.push({
         label: `${compLabel} (${series.unit})`,
         data: compData,
@@ -193,6 +247,10 @@ export class ReportTrendChartComponent implements AfterViewInit, OnChanges, OnDe
         pointRadius: compData.length > 50 ? 0 : 3,
         pointHoverRadius: 6
       });
+    }
+
+    if (datasets.length === 0 || labels.length === 0) {
+      return;
     }
 
     const config: ChartConfiguration<'line'> = {
@@ -224,7 +282,19 @@ export class ReportTrendChartComponent implements AfterViewInit, OnChanges, OnDe
             borderColor: isDark ? '#334155' : '#e2e8f0',
             borderWidth: 1,
             padding: 10,
-            cornerRadius: 12
+            cornerRadius: 12,
+            callbacks: {
+              title: (tooltipItems) => {
+                if (!tooltipItems || tooltipItems.length === 0) return '';
+                const idx = tooltipItems[0].dataIndex;
+                const pPoint = series.primaryPoints?.[idx];
+                const cPoint = series.comparisonPoints?.[idx];
+                if (pPoint && cPoint) {
+                  return `${pPoint.label}  vs  ${cPoint.label}`;
+                }
+                return pPoint?.label || cPoint?.label || tooltipItems[0].label || '';
+              }
+            }
           }
         },
         scales: {

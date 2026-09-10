@@ -96,7 +96,7 @@ import { ReportExportMenuComponent } from './components/report-export-menu/repor
           (customFromChange)="customFrom = $event"
           (customToChange)="customTo = $event"
           (comparisonToggle)="comparisonEnabled = $event"
-          (comparisonShortcutChange)="comparisonShortcut = $event"
+          (comparisonShortcutChange)="onComparisonShortcutChange($event)"
           (comparisonCustomFromChange)="comparisonCustomFrom = $event"
           (comparisonCustomToChange)="comparisonCustomTo = $event"
           (generateReport)="loadReportData()"
@@ -132,7 +132,12 @@ import { ReportExportMenuComponent } from './components/report-export-menu/repor
 
         <!-- 3. Paginated Telemetry Table -->
         <div class="page-break">
-          <app-report-data-table [readings]="reportData.primaryReadings"></app-report-data-table>
+          <app-report-data-table
+            [primaryReadings]="reportData.primaryReadings"
+            [comparisonReadings]="reportData.comparisonReadings || []"
+            [primaryLabel]="reportData.primaryPeriodLabel || ''"
+            [comparisonLabel]="reportData.comparisonPeriodLabel || ''"
+          ></app-report-data-table>
         </div>
       } @else if (loading) {
         <div class="py-20 flex flex-col items-center justify-center text-slate-400 space-y-3">
@@ -204,8 +209,28 @@ export class ReportsComponent implements OnInit {
 
   onShortcutChange(shortcut: TimeRangeShortcut): void {
     this.selectedShortcut = shortcut;
+    if (shortcut === 'custom' && (!this.customFrom || !this.customTo)) {
+      const today = new Date();
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(today.getDate() - 30);
+      this.customTo = today.toISOString().slice(0, 10);
+      this.customFrom = thirtyDaysAgo.toISOString().slice(0, 10);
+    }
     if (shortcut !== 'custom') {
       this.loadReportData();
+    }
+  }
+
+  onComparisonShortcutChange(shortcut: TimeRangeShortcut): void {
+    this.comparisonShortcut = shortcut;
+    if (shortcut === 'custom' && (!this.comparisonCustomFrom || !this.comparisonCustomTo)) {
+      const today = new Date();
+      const sixtyDaysAgo = new Date();
+      sixtyDaysAgo.setDate(today.getDate() - 60);
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(today.getDate() - 30);
+      this.comparisonCustomTo = thirtyDaysAgo.toISOString().slice(0, 10);
+      this.comparisonCustomFrom = sixtyDaysAgo.toISOString().slice(0, 10);
     }
   }
 
@@ -214,6 +239,36 @@ export class ReportsComponent implements OnInit {
       this.loading = false;
       this.cdr.markForCheck();
       return;
+    }
+
+    if (this.selectedShortcut === 'custom') {
+      if (!this.customFrom || !this.customTo) {
+        this.loading = false;
+        this.errorMsg = 'Please select both start and end dates for the report.';
+        this.cdr.markForCheck();
+        return;
+      }
+      if (this.customFrom > this.customTo) {
+        this.loading = false;
+        this.errorMsg = 'Report start date cannot be after end date.';
+        this.cdr.markForCheck();
+        return;
+      }
+    }
+
+    if (this.comparisonEnabled && this.comparisonShortcut === 'custom') {
+      if (!this.comparisonCustomFrom || !this.comparisonCustomTo) {
+        this.loading = false;
+        this.errorMsg = 'Please select both start and end dates for the comparison period.';
+        this.cdr.markForCheck();
+        return;
+      }
+      if (this.comparisonCustomFrom > this.comparisonCustomTo) {
+        this.loading = false;
+        this.errorMsg = 'Comparison start date cannot be after end date.';
+        this.cdr.markForCheck();
+        return;
+      }
     }
 
     this.loading = true;

@@ -163,6 +163,31 @@ describe('ReportExportService', () => {
       expect(csv).toContain('Comparison Mean,Delta Abs,Delta %,Improvement?');
       expect(csv).toContain('18,-3.5,-19.4%,YES');
     });
+
+    it('should include Period column and comparison readings in raw telemetry section when comparison readings are present', () => {
+      const reportWithCompReadings: ReportData = {
+        ...mockReport,
+        comparisonPeriodLabel: '2026-07-29',
+        primaryPeriodLabel: '2026-07-28',
+        comparisonReadings: [
+          {
+            deviceId: 'SENSOR-001',
+            time: '2026-07-29T15:20:00Z',
+            pm2_5: 16.5,
+            pm10: 28.0,
+            pm1_0: 9.0,
+            co2: 480,
+            temperature: 24.0,
+            humidity: 55.0
+          }
+        ]
+      };
+
+      const csv = service.generateCsvContent(reportWithCompReadings);
+      expect(csv).toContain('Timestamp,Period,Device ID,PM2.5 (µg/m³)');
+      expect(csv).toContain('2026-09-08T10:00:00Z,2026-07-28,SENSOR-001');
+      expect(csv).toContain('2026-07-29T15:20:00Z,2026-07-29,SENSOR-001,16.5');
+    });
   });
 
   describe('triggerPrintPdf', () => {

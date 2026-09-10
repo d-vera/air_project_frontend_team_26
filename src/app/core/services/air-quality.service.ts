@@ -30,6 +30,18 @@ export class AirQualityService {
   }
 
   /**
+   * Formats a date string to ISO-8601 Instant format expected by backend.
+   * If 'YYYY-MM-DD', appends start of day (T00:00:00Z) or end of day (T23:59:59Z).
+   */
+  private formatIsoDate(dateStr: string, isEnd = false): string {
+    const trimmed = dateStr.trim();
+    if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
+      return isEnd ? `${trimmed}T23:59:59Z` : `${trimmed}T00:00:00Z`;
+    }
+    return trimmed;
+  }
+
+  /**
    * Fetch historical air quality readings.
    * Access: Public for 24h, 7d, 30d; Authenticated required for 1y and custom date ranges.
    */
@@ -38,7 +50,19 @@ export class AirQualityService {
     if (query.deviceId && query.deviceId.trim().length > 0) {
       params = params.set('deviceId', query.deviceId.trim());
     }
-    if (query.rangeShortcut && query.rangeShortcut !== 'custom') {
+
+    const hasFrom = !!(query.from && query.from.trim().length > 0);
+    const hasTo = !!(query.to && query.to.trim().length > 0);
+
+    if (hasFrom) {
+      params = params.set('from', this.formatIsoDate(query.from!, false));
+    }
+    if (hasTo) {
+      params = params.set('to', this.formatIsoDate(query.to!, true));
+    }
+
+    // Backend enforces mutual exclusivity between 'range' and 'from'/'to'
+    if (!hasFrom && !hasTo && query.rangeShortcut && query.rangeShortcut !== 'custom') {
       const rangeMap: Record<string, string> = {
         '24h': 'LAST_DAY',
         '7d': 'LAST_WEEK',
@@ -48,12 +72,7 @@ export class AirQualityService {
       const backendRange = rangeMap[query.rangeShortcut] || query.rangeShortcut;
       params = params.set('range', backendRange);
     }
-    if (query.from) {
-      params = params.set('from', query.from);
-    }
-    if (query.to) {
-      params = params.set('to', query.to);
-    }
+
     return this.http.get<any>(`${this.API_URL}/historical`, { params }).pipe(
       map(res => {
         if (!res) {

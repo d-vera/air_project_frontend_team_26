@@ -151,4 +151,93 @@ describe('ReportsComponent', () => {
     expect(component.selectedSensorUid).toBe('SENSOR-002');
     expect(mockAirQualityService.getHistoricalReadings).toHaveBeenCalled();
   });
+
+  it('should initialize default dates when custom shortcut is selected', () => {
+    component.customFrom = '';
+    component.customTo = '';
+    component.onShortcutChange('custom');
+    expect(component.selectedShortcut).toBe('custom');
+    expect(component.customFrom).toBeTruthy();
+    expect(component.customTo).toBeTruthy();
+  });
+
+  it('should initialize comparison default dates when custom comparison shortcut is selected', () => {
+    component.comparisonCustomFrom = '';
+    component.comparisonCustomTo = '';
+    component.onComparisonShortcutChange('custom');
+    expect(component.comparisonShortcut).toBe('custom');
+    expect(component.comparisonCustomFrom).toBeTruthy();
+    expect(component.comparisonCustomTo).toBeTruthy();
+  });
+
+  it('should show error message when custom dates are missing on loadReportData', () => {
+    component.selectedShortcut = 'custom';
+    component.customFrom = '';
+    component.customTo = '';
+    component.loadReportData();
+    expect(component.errorMsg).toBe('Please select both start and end dates for the report.');
+    expect(component.loading).toBe(false);
+  });
+
+  it('should show error message when custom from date is after to date', () => {
+    component.selectedShortcut = 'custom';
+    component.customFrom = '2026-09-30';
+    component.customTo = '2026-09-28';
+    component.loadReportData();
+    expect(component.errorMsg).toBe('Report start date cannot be after end date.');
+    expect(component.loading).toBe(false);
+  });
+
+  it('should show error message when comparison custom dates are invalid', () => {
+    component.selectedShortcut = '30d';
+    component.comparisonEnabled = true;
+    component.comparisonShortcut = 'custom';
+    component.comparisonCustomFrom = '2026-09-30';
+    component.comparisonCustomTo = '2026-09-28';
+    component.loadReportData();
+    expect(component.errorMsg).toBe('Comparison start date cannot be after end date.');
+    expect(component.loading).toBe(false);
+  });
+
+  it('should fetch report data successfully when custom dates are valid', () => {
+    component.selectedShortcut = 'custom';
+    component.customFrom = '2026-09-01';
+    component.customTo = '2026-09-08';
+    component.loadReportData();
+    expect(mockAirQualityService.getHistoricalReadings).toHaveBeenCalledWith(
+      expect.objectContaining({
+        from: '2026-09-01',
+        to: '2026-09-08'
+      })
+    );
+    expect(component.errorMsg).toBeNull();
+  });
+
+  it('should generate report with comparison readings when comparison is enabled', () => {
+    const compReadings: AirQualityReading[] = [
+      {
+        deviceId: 'SENSOR-001',
+        time: '2026-08-01T10:00:00Z',
+        pm2_5: 18.0,
+        pm10: 30.0,
+        pm1_0: 10.0,
+        co2: 600,
+        temperature: 20.0,
+        humidity: 60.0
+      }
+    ];
+
+    mockAirQualityService.getHistoricalReadings
+      .mockReturnValueOnce(of({ readings: mockReadings }))
+      .mockReturnValueOnce(of({ readings: compReadings }));
+
+    component.comparisonEnabled = true;
+    component.selectedShortcut = '30d';
+    component.comparisonShortcut = '30d';
+    component.loadReportData();
+
+    expect(component.reportData).toBeTruthy();
+    expect(component.reportData?.primaryReadings.length).toBe(1);
+    expect(component.reportData?.comparisonReadings?.length).toBe(1);
+  });
 });

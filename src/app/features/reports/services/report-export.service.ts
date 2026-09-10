@@ -76,19 +76,47 @@ export class ReportExportService {
 
     // ── Raw Telemetry Data Block ──
     lines.push('--- RAW TELEMETRY READINGS ---');
-    lines.push('Timestamp,Device ID,PM2.5 (µg/m³),PM10 (µg/m³),PM1.0 (µg/m³),CO2 (ppm),Temperature (°C),Humidity (%)');
+    const hasComp = !!(report.comparisonReadings && report.comparisonReadings.length > 0);
+    if (hasComp) {
+      lines.push('Timestamp,Period,Device ID,PM2.5 (µg/m³),PM10 (µg/m³),PM1.0 (µg/m³),CO2 (ppm),Temperature (°C),Humidity (%)');
 
-    for (const r of report.primaryReadings) {
-      lines.push([
-        this.escapeCsv(r.time),
-        this.escapeCsv(r.deviceId),
-        r.pm2_5 ?? '',
-        r.pm10 ?? '',
-        r.pm1_0 ?? '',
-        r.co2 ?? '',
-        r.temperature ?? '',
-        r.humidity ?? ''
-      ].join(','));
+      const primLabel = report.primaryPeriodLabel || 'Primary';
+      const compLabel = report.comparisonPeriodLabel || 'Comparison';
+
+      const mergedList = [
+        ...report.primaryReadings.map(r => ({ reading: r, period: primLabel })),
+        ...report.comparisonReadings!.map(r => ({ reading: r, period: compLabel }))
+      ].sort((a, b) => new Date(a.reading.time).getTime() - new Date(b.reading.time).getTime());
+
+      for (const item of mergedList) {
+        const r = item.reading;
+        lines.push([
+          this.escapeCsv(r.time),
+          this.escapeCsv(item.period),
+          this.escapeCsv(r.deviceId),
+          r.pm2_5 ?? '',
+          r.pm10 ?? '',
+          r.pm1_0 ?? '',
+          r.co2 ?? '',
+          r.temperature ?? '',
+          r.humidity ?? ''
+        ].join(','));
+      }
+    } else {
+      lines.push('Timestamp,Device ID,PM2.5 (µg/m³),PM10 (µg/m³),PM1.0 (µg/m³),CO2 (ppm),Temperature (°C),Humidity (%)');
+
+      for (const r of report.primaryReadings) {
+        lines.push([
+          this.escapeCsv(r.time),
+          this.escapeCsv(r.deviceId),
+          r.pm2_5 ?? '',
+          r.pm10 ?? '',
+          r.pm1_0 ?? '',
+          r.co2 ?? '',
+          r.temperature ?? '',
+          r.humidity ?? ''
+        ].join(','));
+      }
     }
 
     return lines.join('\r\n');

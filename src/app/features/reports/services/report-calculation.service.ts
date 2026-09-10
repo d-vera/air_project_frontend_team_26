@@ -216,7 +216,8 @@ export class ReportCalculationService {
   ): OverlayTimeSeries {
     const meta = REPORT_PARAMETERS.find(p => p.key === parameter) || REPORT_PARAMETERS[0];
 
-    const sortedPrimary = [...primaryReadings].sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime());
+    const safePrimary = primaryReadings || [];
+    const sortedPrimary = [...safePrimary].sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime());
     const primaryPoints: TimeSeriesPoint[] = sortedPrimary.map(r => ({
       timestamp: r.time,
       label: this.formatPointLabel(r.time),

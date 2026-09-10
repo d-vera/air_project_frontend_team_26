@@ -156,6 +156,22 @@ describe('ReportCalculationService', () => {
       expect(series.comparisonPoints?.length).toBe(1);
       expect(series.primaryPoints[0].value).toBe(12.0);
     });
+
+    it('should handle empty primaryReadings gracefully when comparisonReadings are present', () => {
+      const compReadings: AirQualityReading[] = [sampleReadings[0]];
+      const series = service.prepareOverlaySeries([], compReadings, 'pm2_5');
+
+      expect(series.primaryPoints.length).toBe(0);
+      expect(series.comparisonPoints?.length).toBe(1);
+      expect(series.comparisonPoints![0].value).toBe(12.0);
+    });
+
+    it('should handle undefined comparisonReadings', () => {
+      const series = service.prepareOverlaySeries(sampleReadings, undefined, 'pm2_5');
+
+      expect(series.primaryPoints.length).toBe(3);
+      expect(series.comparisonPoints).toBeUndefined();
+    });
   });
 
   describe('generateReportData', () => {

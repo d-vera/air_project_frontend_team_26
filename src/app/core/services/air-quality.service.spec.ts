@@ -89,6 +89,62 @@ describe('AirQualityService', () => {
     req.flush(mockBackendResponse);
   });
 
+  it('should format YYYY-MM-DD dates to ISO timestamps (start of day and end of day)', () => {
+    service.getHistoricalReadings({
+      deviceId: 'SENSOR-002',
+      from: '2026-09-28',
+      to: '2026-09-28'
+    }).subscribe(res => {
+      expect(res.readings).toBeDefined();
+    });
+
+    const req = httpMock.expectOne(
+      r => r.url === '/api/air-quality/historical' &&
+           r.params.get('from') === '2026-09-28T00:00:00Z' &&
+           r.params.get('to') === '2026-09-28T23:59:59Z'
+    );
+    expect(req.request.method).toBe('GET');
+    req.flush({ readings: [] });
+  });
+
+  it('should preserve ISO timestamp if already provided with time', () => {
+    service.getHistoricalReadings({
+      deviceId: 'SENSOR-002',
+      from: '2026-09-28T12:00:00Z',
+      to: '2026-09-29T18:30:00Z'
+    }).subscribe(res => {
+      expect(res.readings).toBeDefined();
+    });
+
+    const req = httpMock.expectOne(
+      r => r.url === '/api/air-quality/historical' &&
+           r.params.get('from') === '2026-09-28T12:00:00Z' &&
+           r.params.get('to') === '2026-09-29T18:30:00Z'
+    );
+    expect(req.request.method).toBe('GET');
+    req.flush({ readings: [] });
+  });
+
+  it('should not include range parameter when from/to are present (mutually exclusive)', () => {
+    service.getHistoricalReadings({
+      deviceId: 'SENSOR-002',
+      rangeShortcut: '30d',
+      from: '2026-09-01',
+      to: '2026-09-08'
+    }).subscribe(res => {
+      expect(res.readings).toBeDefined();
+    });
+
+    const req = httpMock.expectOne(
+      r => r.url === '/api/air-quality/historical' &&
+           !r.params.has('range') &&
+           r.params.get('from') === '2026-09-01T00:00:00Z' &&
+           r.params.get('to') === '2026-09-08T23:59:59Z'
+    );
+    expect(req.request.method).toBe('GET');
+    req.flush({ readings: [] });
+  });
+
   it('should handle direct readings array format in historical response', () => {
     const mockDirectResponse = {
       readings: [
@@ -116,8 +172,8 @@ describe('AirQualityService', () => {
 
     const req = httpMock.expectOne(
       r => r.url === '/api/air-quality/historical' &&
-           r.params.get('from') === '2026-09-01' &&
-           r.params.get('to') === '2026-09-08'
+           r.params.get('from') === '2026-09-01T00:00:00Z' &&
+           r.params.get('to') === '2026-09-08T23:59:59Z'
     );
     expect(req.request.method).toBe('GET');
     req.flush(mockDirectResponse);

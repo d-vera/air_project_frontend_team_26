@@ -105,4 +105,53 @@ describe('ReportTrendChartComponent', () => {
     expect(component.selectedMetric).toBe('temperature');
     expect(component.thresholdNote).toContain('18.0°C');
   });
+
+  it('should render comparison dataset and display notice banner when primary readings are empty', () => {
+    fixture.componentRef.setInput('report', {
+      ...mockReport,
+      primaryReadings: [],
+      comparisonReadings: [
+        { deviceId: 'SENSOR-001', time: '2026-08-08T10:00:00Z', pm2_5: 25, pm10: 35, pm1_0: 10, co2: 600, temperature: 21, humidity: 50 }
+      ]
+    });
+    fixture.detectChanges();
+
+    expect(component.isPrimaryEmpty).toBe(true);
+    expect(component.hasComparisonData).toBe(true);
+    expect(component.hasAnyData).toBe(true);
+
+    const noticeBanner = fixture.nativeElement.querySelector('.text-amber-700');
+    expect(noticeBanner).toBeTruthy();
+  });
+
+  it('should display empty state message when both primary and comparison readings are empty', () => {
+    fixture.componentRef.setInput('report', {
+      ...mockReport,
+      primaryReadings: [],
+      comparisonReadings: []
+    });
+    fixture.detectChanges();
+
+    expect(component.isPrimaryEmpty).toBe(true);
+    expect(component.hasComparisonData).toBe(false);
+    expect(component.hasAnyData).toBe(false);
+
+    const canvasWrapper = fixture.nativeElement.querySelector('.relative.w-full');
+    expect(canvasWrapper.classList.contains('hidden')).toBe(true);
+  });
+
+  it('should extend labels when comparison has more points than primary', () => {
+    fixture.componentRef.setInput('report', {
+      ...mockReport,
+      primaryReadings: [
+        { deviceId: 'SENSOR-001', time: '2026-09-08T10:00:00Z', pm2_5: 15, pm10: 30, pm1_0: 8, co2: 500, temperature: 22, humidity: 55 }
+      ],
+      comparisonReadings: [
+        { deviceId: 'SENSOR-001', time: '2026-08-08T10:00:00Z', pm2_5: 20, pm10: 35, pm1_0: 10, co2: 600, temperature: 21, humidity: 50 },
+        { deviceId: 'SENSOR-001', time: '2026-08-09T10:00:00Z', pm2_5: 22, pm10: 38, pm1_0: 11, co2: 610, temperature: 20, humidity: 52 }
+      ]
+    });
+    fixture.detectChanges();
+    expect(() => component.renderChart()).not.toThrow();
+  });
 });
