@@ -57,7 +57,6 @@ import { ReportExportMenuComponent } from './components/report-export-menu/repor
             [disabled]="loading || !reportData"
             (exportPdf)="onExportPdf()"
             (exportExcel)="onExportExcel()"
-            (exportCsv)="onExportCsv()"
           ></app-report-export-menu>
         </div>
       </div>

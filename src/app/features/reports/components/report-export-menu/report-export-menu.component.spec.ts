@@ -34,9 +34,8 @@ describe('ReportExportMenuComponent', () => {
     expect(spy).toHaveBeenCalled();
   });
 
-  it('should emit exportCsv when CSV button is clicked', () => {
-    const spy = vi.spyOn(component.exportCsv, 'emit');
-    component.exportCsv.emit();
-    expect(spy).toHaveBeenCalled();
+  it('should render only PDF and Excel export buttons', () => {
+    const buttons = fixture.nativeElement.querySelectorAll('button');
+    expect(buttons.length).toBe(2);
   });
 });
