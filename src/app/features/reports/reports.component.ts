@@ -94,7 +94,7 @@ import { ReportExportMenuComponent } from './components/report-export-menu/repor
           (shortcutChange)="onShortcutChange($event)"
           (customFromChange)="customFrom = $event"
           (customToChange)="customTo = $event"
-          (comparisonToggle)="comparisonEnabled = $event"
+          (comparisonToggle)="onComparisonToggle($event)"
           (comparisonShortcutChange)="onComparisonShortcutChange($event)"
           (comparisonCustomFromChange)="comparisonCustomFrom = $event"
           (comparisonCustomToChange)="comparisonCustomTo = $event"
@@ -217,6 +217,22 @@ export class ReportsComponent implements OnInit {
     }
     if (shortcut !== 'custom') {
       this.loadReportData();
+    }
+  }
+
+  onComparisonToggle(enabled: boolean): void {
+    this.comparisonEnabled = enabled;
+    if (enabled) {
+      this.comparisonShortcut = 'custom';
+      if (!this.comparisonCustomFrom || !this.comparisonCustomTo) {
+        const today = new Date();
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(today.getDate() - 30);
+        const sixtyDaysAgo = new Date();
+        sixtyDaysAgo.setDate(today.getDate() - 60);
+        this.comparisonCustomTo = thirtyDaysAgo.toISOString().slice(0, 10);
+        this.comparisonCustomFrom = sixtyDaysAgo.toISOString().slice(0, 10);
+      }
     }
   }
 

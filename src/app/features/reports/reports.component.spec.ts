@@ -240,4 +240,17 @@ describe('ReportsComponent', () => {
     expect(component.reportData?.primaryReadings.length).toBe(1);
     expect(component.reportData?.comparisonReadings?.length).toBe(1);
   });
+
+  it('should initialize custom comparison dates when comparison is toggled on', () => {
+    component.comparisonEnabled = false;
+    component.comparisonCustomFrom = '';
+    component.comparisonCustomTo = '';
+
+    component.onComparisonToggle(true);
+
+    expect(component.comparisonEnabled).toBe(true);
+    expect(component.comparisonShortcut).toBe('custom');
+    expect(component.comparisonCustomFrom).toBeTruthy();
+    expect(component.comparisonCustomTo).toBeTruthy();
+  });
 });

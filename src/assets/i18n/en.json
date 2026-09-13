@@ -242,6 +242,7 @@
     "COMPARE_DESCRIPTION": "Comparison Baseline Range",
     "COMPARE_DISABLED_NOTE": "Enable to analyze side-by-side trends against a baseline period",
     "GENERATE_BUTTON": "Generate Report",
+    "GENERATE_COMPARISON": "Generate Comparison",
     "LOADING": "Loading...",
     "LOADING_REPORT": "Analyzing telemetry and generating report...",
     "RETRY": "Retry",

@@ -67,4 +67,51 @@ describe('ReportFilterBarComponent', () => {
     component.onGenerate();
     expect(spy).toHaveBeenCalled();
   });
+
+  it('should display GENERATE_COMPARISON and light purple style when comparisonEnabled is false', () => {
+    component.comparisonEnabled = false;
+    fixture.detectChanges();
+
+    const buttonEl = fixture.nativeElement.querySelector('button[type="button"]');
+    expect(buttonEl.textContent).toContain('REPORTS.GENERATE_COMPARISON');
+    expect(buttonEl.classList.contains('bg-violet-400')).toBe(true);
+    expect(buttonEl.classList.contains('bg-violet-600')).toBe(false);
+  });
+
+  it('should display GENERATE_COMPARISON and strong purple style when comparisonEnabled is true', () => {
+    component.comparisonEnabled = true;
+    fixture.detectChanges();
+
+    const buttonEl = fixture.nativeElement.querySelector('button[type="button"]');
+    expect(buttonEl.textContent).toContain('REPORTS.GENERATE_COMPARISON');
+    expect(buttonEl.classList.contains('bg-violet-600')).toBe(true);
+    expect(buttonEl.classList.contains('bg-violet-400')).toBe(false);
+  });
+
+  it('should show only custom date inputs and no shortcut buttons in compare periods when activated', () => {
+    component.comparisonEnabled = true;
+    fixture.detectChanges();
+
+    const compareSection = fixture.nativeElement.querySelector('.bg-violet-50\\/60');
+    expect(compareSection).toBeTruthy();
+
+    // Custom date inputs should exist
+    const dateInputs = compareSection.querySelectorAll('input[type="date"]');
+    expect(dateInputs.length).toBe(2);
+
+    // No shortcut buttons should be rendered inside compare section
+    const shortcutButtons = compareSection.querySelectorAll('button');
+    expect(shortcutButtons.length).toBe(0);
+  });
+
+  it('should emit comparisonCustomFromChange and comparisonCustomToChange', () => {
+    const fromSpy = vi.spyOn(component.comparisonCustomFromChange, 'emit');
+    const toSpy = vi.spyOn(component.comparisonCustomToChange, 'emit');
+
+    component.onComparisonFromChange('2026-08-01');
+    expect(fromSpy).toHaveBeenCalledWith('2026-08-01');
+
+    component.onComparisonToChange('2026-08-31');
+    expect(toSpy).toHaveBeenCalledWith('2026-08-31');
+  });
 });

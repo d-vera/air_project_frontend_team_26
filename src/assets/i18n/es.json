@@ -242,6 +242,7 @@
     "COMPARE_DESCRIPTION": "Rango de Referencia de Comparación",
     "COMPARE_DISABLED_NOTE": "Activa para analizar tendencias comparativas contra un periodo de referencia",
     "GENERATE_BUTTON": "Generar Reporte",
+    "GENERATE_COMPARISON": "Generar comparación",
     "LOADING": "Cargando...",
     "LOADING_REPORT": "Analizando telemetría y generando reporte...",
     "RETRY": "Reintentar",

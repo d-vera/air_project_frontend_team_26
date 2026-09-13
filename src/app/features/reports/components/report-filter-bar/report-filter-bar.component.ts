@@ -29,7 +29,15 @@ import { TimeRangeShortcut } from '../../../../models/air-quality.model';
           (click)="onGenerate()"
           [disabled]="loading || !selectedSensorUid"
           type="button"
-          class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm text-white bg-sky-600 hover:bg-sky-500 disabled:opacity-50 disabled:cursor-not-allowed shadow-md shadow-sky-600/20 transition-all cursor-pointer shrink-0"
+          [class.bg-violet-400]="!comparisonEnabled"
+          [class.hover:bg-violet-500]="!comparisonEnabled"
+          [class.shadow-violet-400/20]="!comparisonEnabled"
+          [class.bg-violet-600]="comparisonEnabled"
+          [class.hover:bg-violet-500]="comparisonEnabled"
+          [class.shadow-violet-600/30]="comparisonEnabled"
+          [class.ring-2]="comparisonEnabled"
+          [class.ring-violet-400/50]="comparisonEnabled"
+          class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm text-white disabled:opacity-50 disabled:cursor-not-allowed shadow-md transition-all cursor-pointer shrink-0"
         >
           @if (loading) {
             <svg class="animate-spin w-4 h-4 text-white" fill="none" viewBox="0 0 24 24">
@@ -41,7 +49,7 @@ import { TimeRangeShortcut } from '../../../../models/air-quality.model';
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
-            <span>{{ 'REPORTS.GENERATE_BUTTON' | translate }}</span>
+            <span>{{ 'REPORTS.GENERATE_COMPARISON' | translate }}</span>
           }
         </button>
       </div>
@@ -147,38 +155,26 @@ import { TimeRangeShortcut } from '../../../../models/air-quality.model';
               <p class="text-[11px] font-semibold text-violet-700 dark:text-violet-300">
                 {{ 'REPORTS.COMPARE_DESCRIPTION' | translate }}
               </p>
-              <div class="flex flex-wrap items-center gap-1.5 bg-white/80 dark:bg-slate-900/80 p-1 rounded-xl">
-                @for (shortcut of comparisonShortcuts; track shortcut) {
-                  <button
-                    (click)="onComparisonShortcutSelect(shortcut)"
-                    type="button"
-                    [class.bg-violet-600]="comparisonShortcut === shortcut"
-                    [class.text-white]="comparisonShortcut === shortcut"
-                    [class.text-slate-600]="comparisonShortcut !== shortcut"
-                    [class.dark:text-slate-300]="comparisonShortcut !== shortcut"
-                    class="px-2 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer"
-                  >
-                    {{ getShortcutTranslationKey(shortcut) | translate }}
-                  </button>
-                }
-              </div>
-
-              @if (comparisonShortcut === 'custom') {
-                <div class="grid grid-cols-2 gap-2 pt-1">
+              <div class="grid grid-cols-2 gap-2 pt-1">
+                <div>
+                  <label class="block text-[11px] text-slate-500 dark:text-slate-400">{{ 'REPORTS.FROM' | translate }}</label>
                   <input
                     type="date"
                     [ngModel]="comparisonCustomFrom"
                     (ngModelChange)="onComparisonFromChange($event)"
-                    class="w-full px-2 py-1 text-xs bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-200"
+                    class="w-full px-2.5 py-1.5 text-xs bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-violet-500"
                   />
+                </div>
+                <div>
+                  <label class="block text-[11px] text-slate-500 dark:text-slate-400">{{ 'REPORTS.TO' | translate }}</label>
                   <input
                     type="date"
                     [ngModel]="comparisonCustomTo"
                     (ngModelChange)="onComparisonToChange($event)"
-                    class="w-full px-2 py-1 text-xs bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-200"
+                    class="w-full px-2.5 py-1.5 text-xs bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-violet-500"
                   />
                 </div>
-              }
+              </div>
             </div>
           } @else {
             <p class="text-xs text-slate-400 dark:text-slate-500 pt-1">
