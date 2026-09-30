@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit, inject } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -99,6 +99,7 @@ import { MapCoordinatePickerComponent } from '../../../../shared/components/map-
               </label>
               <select
                 formControlName="sensorStatus"
+                (change)="onStatusChange()"
                 class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
               >
                 <option value="ONLINE">{{ 'SENSOR.STATUS_ONLINE' | translate }}</option>
@@ -179,6 +180,45 @@ import { MapCoordinatePickerComponent } from '../../../../shared/components/map-
 
       </div>
     </div>
+
+    <!-- Maintenance Confirmation Modal -->
+    @if (showMaintenanceConfirm()) {
+      <div class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
+        <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 max-w-md w-full border border-slate-200 dark:border-slate-800 shadow-2xl space-y-5 animate-scale-in">
+          <div class="w-12 h-12 rounded-2xl bg-amber-100 dark:bg-amber-950 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+          </div>
+
+          <div>
+            <h3 class="text-lg font-bold text-slate-900 dark:text-slate-100">
+              {{ 'SENSOR.MAINTENANCE_CONFIRM_TITLE' | translate }}
+            </h3>
+            <p class="mt-2 text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+              {{ 'SENSOR.MAINTENANCE_CONFIRM_MSG' | translate }}
+            </p>
+          </div>
+
+          <div class="flex items-center justify-end space-x-3 pt-2">
+            <button
+              (click)="cancelMaintenanceChange()"
+              type="button"
+              class="px-4 py-2.5 rounded-xl font-semibold text-xs text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+            >
+              {{ 'SENSOR.CANCEL_BTN' | translate }}
+            </button>
+            <button
+              (click)="confirmMaintenanceChange()"
+              type="button"
+              class="px-5 py-2.5 rounded-xl font-semibold text-xs text-white bg-amber-600 hover:bg-amber-700 transition shadow-md shadow-amber-600/20 cursor-pointer"
+            >
+              {{ 'SENSOR.MAINTENANCE_CONFIRM_BTN' | translate }}
+            </button>
+          </div>
+        </div>
+      </div>
+    }
   `
 })
 export class SensorDialogComponent implements OnInit {
@@ -191,6 +231,9 @@ export class SensorDialogComponent implements OnInit {
   sensorForm!: FormGroup;
   isSubmitting = false;
 
+  showMaintenanceConfirm = signal<boolean>(false);
+  private previousStatus: SensorStatus = 'ONLINE';
+
   get isEditMode(): boolean {
     return !!this.sensor;
   }
@@ -200,6 +243,7 @@ export class SensorDialogComponent implements OnInit {
   }
 
   private initForm(): void {
+    this.previousStatus = this.sensor?.sensorStatus || 'ONLINE';
     this.sensorForm = this.fb.group({
       name: [this.sensor?.name || '', [Validators.required]],
       uidSensor: [{ value: this.sensor?.uidSensor || '', disabled: this.isEditMode }, [Validators.required]],
@@ -209,6 +253,25 @@ export class SensorDialogComponent implements OnInit {
       latitude: [this.sensor?.latitude ?? -12.046374, [Validators.required]],
       longitude: [this.sensor?.longitude ?? -77.042793, [Validators.required]]
     });
+  }
+
+  onStatusChange(): void {
+    const newStatus = this.sensorForm.get('sensorStatus')?.value as SensorStatus;
+    if (newStatus === 'MAINTENANCE' && this.previousStatus !== 'MAINTENANCE') {
+      this.showMaintenanceConfirm.set(true);
+    } else {
+      this.previousStatus = newStatus;
+    }
+  }
+
+  confirmMaintenanceChange(): void {
+    this.previousStatus = 'MAINTENANCE';
+    this.showMaintenanceConfirm.set(false);
+  }
+
+  cancelMaintenanceChange(): void {
+    this.sensorForm.patchValue({ sensorStatus: this.previousStatus });
+    this.showMaintenanceConfirm.set(false);
   }
 
   onCoordinatesSelected(coords: { latitude: number; longitude: number }): void {
@@ -250,3 +313,4 @@ export class SensorDialogComponent implements OnInit {
     this.cancel.emit();
   }
 }
+

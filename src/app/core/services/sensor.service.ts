@@ -67,4 +67,20 @@ export class SensorService {
       })
     );
   }
+
+  reactivateSensor(id: number): Observable<Sensor> {
+    return this.http.put<Sensor>(`${this.baseUrl}/${id}/reactivate`, {}).pipe(
+      tap((reactivated) => {
+        const current = this.sensorsSubject.value;
+        const index = current.findIndex(s => s.id === id);
+        if (index !== -1) {
+          const updatedList = [...current];
+          updatedList[index] = reactivated;
+          this.sensorsSubject.next(updatedList);
+        } else {
+          this.sensorsSubject.next([...current, reactivated]);
+        }
+      })
+    );
+  }
 }

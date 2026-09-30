@@ -222,12 +222,21 @@
     "NO_SENSORS": "No se encontraron estaciones sensoras con esos criterios",
     "SAVE_SUCCESS": "¡Sensor guardado con éxito!",
     "DELETE_SUCCESS": "¡Sensor desactivado con éxito!",
+    "REACTIVATE_SUCCESS": "¡Sensor reactivado exitosamente!",
     "CONFIRM_DELETE_TITLE": "Desactivar Sensor",
     "CONFIRM_DELETE_MSG": "¿Estás seguro de que deseas desactivar la estación \"{{name}}\" (UID: {{uid}})?",
     "DELETE_BTN": "Desactivar Estación",
+    "REACTIVATE_BTN": "Reactivar",
+    "REACTIVATE_CONFIRM_TITLE": "Reactivar Sensor",
+    "REACTIVATE_CONFIRM_MSG": "¿Está seguro de que desea reactivar la estación \"{{name}}\" (UID: {{uid}})? Se marcará como OFFLINE hasta recibir un latido telemétrico.",
     "CANCEL_BTN": "Cancelar",
     "SAVE_BTN": "Guardar Sensor",
-    "CREATE_BTN": "Registrar Estación"
+    "CREATE_BTN": "Registrar Estación",
+    "INCLUDE_INACTIVE": "Incluir inactivos",
+    "INACTIVE_BADGE": "Inactivo",
+    "MAINTENANCE_CONFIRM_TITLE": "Confirmar Modo Mantenimiento",
+    "MAINTENANCE_CONFIRM_MSG": "Establecer la estación en MANTENIMIENTO suspenderá las transiciones automáticas de estado. ¿Está seguro de continuar?",
+    "MAINTENANCE_CONFIRM_BTN": "Confirmar Mantenimiento"
   },
   "REPORTS": {
     "TITLE": "Reportes Ambientales",

@@ -222,12 +222,21 @@
     "NO_SENSORS": "No sensor stations found matching your criteria",
     "SAVE_SUCCESS": "Sensor saved successfully!",
     "DELETE_SUCCESS": "Sensor deleted successfully!",
+    "REACTIVATE_SUCCESS": "Sensor reactivated successfully!",
     "CONFIRM_DELETE_TITLE": "Deactivate Sensor",
     "CONFIRM_DELETE_MSG": "Are you sure you want to deactivate station \"{{name}}\" (UID: {{uid}})?",
     "DELETE_BTN": "Deactivate Station",
+    "REACTIVATE_BTN": "Reactivate",
+    "REACTIVATE_CONFIRM_TITLE": "Reactivate Sensor",
+    "REACTIVATE_CONFIRM_MSG": "Are you sure you want to reactivate station \"{{name}}\" (UID: {{uid}})? It will be marked as OFFLINE until a telemetric heartbeat is received.",
     "CANCEL_BTN": "Cancel",
     "SAVE_BTN": "Save Sensor",
-    "CREATE_BTN": "Register Station"
+    "CREATE_BTN": "Register Station",
+    "INCLUDE_INACTIVE": "Include Inactive",
+    "INACTIVE_BADGE": "Inactive",
+    "MAINTENANCE_CONFIRM_TITLE": "Confirm Maintenance Mode",
+    "MAINTENANCE_CONFIRM_MSG": "Setting station to MAINTENANCE will suspend automatic status transitions. Are you sure you want to proceed?",
+    "MAINTENANCE_CONFIRM_BTN": "Confirm Maintenance"
   },
   "REPORTS": {
     "TITLE": "Environmental Reports",

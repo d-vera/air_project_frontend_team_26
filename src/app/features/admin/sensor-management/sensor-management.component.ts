@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 import { SensorService } from '../../../core/services/sensor.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { Sensor, SensorStatus, CreateSensorRequest, UpdateSensorRequest } from '../../../models/sensor.model';
 import { SensorMapComponent } from '../../../shared/components/sensor-map/sensor-map.component';
 import { SensorDialogComponent } from './sensor-dialog/sensor-dialog.component';
@@ -54,10 +55,20 @@ import { SensorDialogComponent } from './sensor-dialog/sensor-dialog.component';
 
       <!-- Toast Feedback Message -->
       @if (toastMessage()) {
-        <div class="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 text-sm flex items-center justify-between">
+        <div
+          class="p-4 rounded-2xl text-sm flex items-center justify-between"
+          [ngClass]="{
+            'bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200': toastType() === 'success',
+            'bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-200': toastType() === 'error'
+          }"
+        >
           <div class="flex items-center space-x-2">
-            <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            <svg class="w-5 h-5" [ngClass]="{ 'text-emerald-500': toastType() === 'success', 'text-rose-500': toastType() === 'error' }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              @if (toastType() === 'success') {
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              } @else {
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              }
             </svg>
             <span>{{ toastMessage()! | translate }}</span>
           </div>
@@ -67,7 +78,7 @@ import { SensorDialogComponent } from './sensor-dialog/sensor-dialog.component';
         </div>
       }
 
-      <!-- Control Bar: Search + Status Filter + View Tabs -->
+      <!-- Control Bar: Search + Status Filter + Inactive Toggle + View Tabs -->
       <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
         <!-- Search Input -->
         <div class="relative flex-1">
@@ -86,6 +97,33 @@ import { SensorDialogComponent } from './sensor-dialog/sensor-dialog.component';
         </div>
 
         <div class="flex items-center gap-3">
+          <!-- Inactive Toggle (Admin Only) -->
+          @if (authService.isAdmin()) {
+            <label
+              class="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs cursor-pointer select-none"
+              [ngClass]="{ 'border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-950/30': showInactive() }"
+            >
+              <input
+                type="checkbox"
+                [ngModel]="showInactive()"
+                (ngModelChange)="showInactive.set($event)"
+                class="sr-only"
+              />
+              <div
+                class="w-8 h-4.5 rounded-full transition-colors relative"
+                [ngClass]="showInactive() ? 'bg-amber-500' : 'bg-slate-300 dark:bg-slate-700'"
+              >
+                <div
+                  class="absolute top-0.5 w-3.5 h-3.5 rounded-full bg-white shadow-sm transition-transform"
+                  [ngClass]="showInactive() ? 'translate-x-3.5' : 'translate-x-0.5'"
+                ></div>
+              </div>
+              <span class="text-xs font-semibold text-slate-600 dark:text-slate-300 whitespace-nowrap">
+                {{ 'SENSOR.INCLUDE_INACTIVE' | translate }}
+              </span>
+            </label>
+          }
+
           <!-- Status Filter Dropdown -->
           <select
             [ngModel]="selectedStatus()"
@@ -183,10 +221,23 @@ import { SensorDialogComponent } from './sensor-dialog/sensor-dialog.component';
                 </thead>
                 <tbody class="divide-y divide-slate-100 dark:divide-slate-800/80 text-xs">
                   @for (s of filteredSensors(); track s.id) {
-                    <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition">
+                    <tr
+                      class="transition"
+                      [ngClass]="{
+                        'hover:bg-slate-50/80 dark:hover:bg-slate-800/40': s.active,
+                        'bg-slate-50/40 dark:bg-slate-800/20 opacity-70': !s.active
+                      }"
+                    >
                       <!-- Name & Type -->
                       <td class="py-3.5 px-4 sm:px-6">
-                        <div class="font-bold text-slate-900 dark:text-slate-100">{{ s.name }}</div>
+                        <div class="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                          {{ s.name }}
+                          @if (!s.active) {
+                            <span class="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400">
+                              {{ 'SENSOR.INACTIVE_BADGE' | translate }}
+                            </span>
+                          }
+                        </div>
                         <div class="text-[11px] text-slate-500 font-mono">{{ s.sensorType }}</div>
                       </td>
 
@@ -233,20 +284,30 @@ import { SensorDialogComponent } from './sensor-dialog/sensor-dialog.component';
 
                       <!-- Actions -->
                       <td class="py-3.5 px-4 text-right sm:pr-6 space-x-2">
-                        <button
-                          (click)="openEditModal(s)"
-                          type="button"
-                          class="px-2.5 py-1 rounded-lg font-semibold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer"
-                        >
-                          {{ 'PROFILE.EDIT_PROFILE' | translate }}
-                        </button>
-                        <button
-                          (click)="openDeleteModal(s)"
-                          type="button"
-                          class="px-2.5 py-1 rounded-lg font-semibold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/60 hover:bg-rose-100 dark:hover:bg-rose-900 transition cursor-pointer"
-                        >
-                          {{ 'ADMIN.DEACTIVATE' | translate }}
-                        </button>
+                        @if (s.active) {
+                          <button
+                            (click)="openEditModal(s)"
+                            type="button"
+                            class="px-2.5 py-1 rounded-lg font-semibold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer"
+                          >
+                            {{ 'PROFILE.EDIT_PROFILE' | translate }}
+                          </button>
+                          <button
+                            (click)="openDeleteModal(s)"
+                            type="button"
+                            class="px-2.5 py-1 rounded-lg font-semibold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/60 hover:bg-rose-100 dark:hover:bg-rose-900 transition cursor-pointer"
+                          >
+                            {{ 'ADMIN.DEACTIVATE' | translate }}
+                          </button>
+                        } @else {
+                          <button
+                            (click)="openReactivateModal(s)"
+                            type="button"
+                            class="px-2.5 py-1 rounded-lg font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900 transition cursor-pointer"
+                          >
+                            {{ 'SENSOR.REACTIVATE_BTN' | translate }}
+                          </button>
+                        }
                       </td>
                     </tr>
                   }
@@ -304,11 +365,51 @@ import { SensorDialogComponent } from './sensor-dialog/sensor-dialog.component';
           </div>
         </div>
       }
+
+      <!-- Reactivate Confirmation Modal -->
+      @if (reactivateModalSensor()) {
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
+          <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 max-w-md w-full border border-slate-200 dark:border-slate-800 shadow-2xl space-y-5 animate-scale-in">
+            <div class="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+            </div>
+
+            <div>
+              <h3 class="text-lg font-bold text-slate-900 dark:text-slate-100">
+                {{ 'SENSOR.REACTIVATE_CONFIRM_TITLE' | translate }}
+              </h3>
+              <p class="mt-2 text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+                {{ 'SENSOR.REACTIVATE_CONFIRM_MSG' | translate:{ name: reactivateModalSensor()?.name, uid: reactivateModalSensor()?.uidSensor } }}
+              </p>
+            </div>
+
+            <div class="flex items-center justify-end space-x-3 pt-2">
+              <button
+                (click)="reactivateModalSensor.set(null)"
+                type="button"
+                class="px-4 py-2.5 rounded-xl font-semibold text-xs text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+              >
+                {{ 'SENSOR.CANCEL_BTN' | translate }}
+              </button>
+              <button
+                (click)="confirmReactivate()"
+                type="button"
+                class="px-5 py-2.5 rounded-xl font-semibold text-xs text-white bg-emerald-600 hover:bg-emerald-700 transition shadow-md shadow-emerald-600/20 cursor-pointer"
+              >
+                {{ 'SENSOR.REACTIVATE_BTN' | translate }}
+              </button>
+            </div>
+          </div>
+        </div>
+      }
     </div>
   `
 })
 export class SensorManagementComponent implements OnInit {
   private sensorService = inject(SensorService);
+  authService = inject(AuthService);
 
   sensors = signal<Sensor[]>([]);
   loading = signal<boolean>(true);
@@ -316,14 +417,18 @@ export class SensorManagementComponent implements OnInit {
   selectedStatus = signal<string>('ALL');
   activeTab = signal<'table' | 'map'>('table');
   toastMessage = signal<string | null>(null);
+  toastType = signal<'success' | 'error'>('success');
+  showInactive = signal<boolean>(false);
 
   isDialogOpen = signal<boolean>(false);
   selectedSensorForEdit = signal<Sensor | null>(null);
   deleteModalSensor = signal<Sensor | null>(null);
+  reactivateModalSensor = signal<Sensor | null>(null);
 
   filteredSensors = computed(() => {
     const term = this.searchTerm().toLowerCase().trim();
     const status = this.selectedStatus();
+    const includeInactive = this.showInactive();
 
     return this.sensors().filter((s) => {
       const matchesTerm = !term ||
@@ -333,7 +438,9 @@ export class SensorManagementComponent implements OnInit {
 
       const matchesStatus = status === 'ALL' || s.sensorStatus === status;
 
-      return matchesTerm && matchesStatus;
+      const matchesActive = includeInactive || s.active;
+
+      return matchesTerm && matchesStatus && matchesActive;
     });
   });
 
@@ -374,7 +481,7 @@ export class SensorManagementComponent implements OnInit {
     if (current) {
       this.sensorService.updateSensor(current.id, payload as UpdateSensorRequest).subscribe({
         next: () => {
-          this.toastMessage.set('SENSOR.SAVE_SUCCESS');
+          this.showToast('SENSOR.SAVE_SUCCESS', 'success');
           this.closeDialog();
           this.loadSensors();
         }
@@ -382,7 +489,7 @@ export class SensorManagementComponent implements OnInit {
     } else {
       this.sensorService.createSensor(payload as CreateSensorRequest).subscribe({
         next: () => {
-          this.toastMessage.set('SENSOR.SAVE_SUCCESS');
+          this.showToast('SENSOR.SAVE_SUCCESS', 'success');
           this.closeDialog();
           this.loadSensors();
         }
@@ -400,7 +507,7 @@ export class SensorManagementComponent implements OnInit {
 
     this.sensorService.deleteSensor(s.id).subscribe({
       next: () => {
-        this.toastMessage.set('SENSOR.DELETE_SUCCESS');
+        this.showToast('SENSOR.DELETE_SUCCESS', 'success');
         this.deleteModalSensor.set(null);
         this.loadSensors();
       },
@@ -408,5 +515,30 @@ export class SensorManagementComponent implements OnInit {
         this.deleteModalSensor.set(null);
       }
     });
+  }
+
+  openReactivateModal(sensor: Sensor): void {
+    this.reactivateModalSensor.set(sensor);
+  }
+
+  confirmReactivate(): void {
+    const s = this.reactivateModalSensor();
+    if (!s) return;
+
+    this.sensorService.reactivateSensor(s.id).subscribe({
+      next: () => {
+        this.showToast('SENSOR.REACTIVATE_SUCCESS', 'success');
+        this.reactivateModalSensor.set(null);
+        this.loadSensors();
+      },
+      error: () => {
+        this.reactivateModalSensor.set(null);
+      }
+    });
+  }
+
+  private showToast(message: string, type: 'success' | 'error'): void {
+    this.toastMessage.set(message);
+    this.toastType.set(type);
   }
 }
