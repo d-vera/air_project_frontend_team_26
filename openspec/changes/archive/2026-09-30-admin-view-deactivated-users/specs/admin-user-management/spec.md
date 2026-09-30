@@ -30,6 +30,8 @@ The system SHALL provide actions to soft-delete (deactivate) an active user via 
 - **WHEN** an admin opens the confirmation dialog for deactivate or activate but clicks cancel
 - **THEN** no API call is made and the user's status remains unchanged
 
+## ADDED Requirements
+
 ### Requirement: UpdateUserRequest model alignment
 The frontend `UpdateUserRequest` TypeScript interface SHALL include an optional `active: boolean` field to match the backend API contract for `PUT /api/users/{id}`.
 

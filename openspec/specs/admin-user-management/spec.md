@@ -4,14 +4,18 @@
 TBD - created by archiving change user-management-frontend. Update Purpose after archive.
 ## Requirements
 ### Requirement: Admin can list all active users
-The system SHALL display all active users in a card-based layout by calling `GET /api/users`. Each card SHALL show the user's name, email, role, and status.
+The system SHALL display all users in a card-based layout by calling `GET /api/users`. The system SHALL allow administrators to filter the list by status (`ALL`, `ACTIVE`, `INACTIVE` / deactivated) and search term. Each card SHALL clearly display the user's name, email, role, and active/inactive status with corresponding action buttons.
 
 #### Scenario: View user list
 - **WHEN** an admin navigates to the admin users page
-- **THEN** the system calls `GET /api/users` and renders each user as a card showing name, email, role, active status, and action buttons
+- **THEN** the system calls `GET /api/users` and renders users matching the selected status filter and search query, displaying count metrics for total, active, and deactivated users
+
+#### Scenario: Filter by deactivated users
+- **WHEN** an admin selects the "Deactivated" / "Inactive" filter tab
+- **THEN** the system displays only inactive/deactivated users with options to view details or re-enable/activate them
 
 #### Scenario: Empty user list
-- **WHEN** an admin views the user list and no users exist
+- **WHEN** an admin views the user list and no users match the current filter or search query
 - **THEN** the system displays a translated "No users found" message
 
 ### Requirement: Admin can view a specific user
@@ -37,15 +41,19 @@ The system SHALL provide a form to update a user's first name, last name, and pa
 - **THEN** the system displays inline validation errors
 
 ### Requirement: Admin can activate or deactivate a user
-The system SHALL provide a toggle or button to soft-delete (deactivate) a user via `DELETE /api/users/{id}`. The action SHALL require confirmation.
+The system SHALL provide actions to soft-delete (deactivate) an active user via `DELETE /api/users/{id}` or reactivate/enable an inactive user via `PUT /api/users/{id}` with `{ "active": true }` in the request body. Both actions SHALL provide confirmation dialogs and immediate visual feedback.
 
 #### Scenario: Deactivate a user
-- **WHEN** an admin clicks the deactivate button on an active user and confirms the action
-- **THEN** the system calls `DELETE /api/users/{id}` and updates the user's status in the UI
+- **WHEN** an admin clicks the deactivate button on an active user and confirms the action in the modal
+- **THEN** the system calls `DELETE /api/users/{id}`, updates the user's status in the UI, and displays a translated deactivation confirmation toast
 
-#### Scenario: Admin cancels deactivation
-- **WHEN** an admin clicks the deactivate button but cancels the confirmation dialog
-- **THEN** no API call is made and the user remains active
+#### Scenario: Reactivate/Enable an inactive user
+- **WHEN** an admin clicks the activate/enable button on a deactivated user and confirms the action in the modal
+- **THEN** the system calls `PUT /api/users/{id}` with `{ "active": true }` in the request body, marks the user as active in the UI, and displays a translated activation confirmation toast
+
+#### Scenario: Admin cancels deactivation or reactivation
+- **WHEN** an admin opens the confirmation dialog for deactivate or activate but clicks cancel
+- **THEN** no API call is made and the user's status remains unchanged
 
 ### Requirement: Admin can assign roles
 The system SHALL provide a role selector to assign `REGISTERED_USER` or `ADMIN` role to a user via `PUT /api/users/{id}/role`.
@@ -68,4 +76,11 @@ The system SHALL protect admin routes with a guard that redirects non-admin user
 #### Scenario: Admin access to admin route
 - **WHEN** a user with role `ADMIN` navigates to `/admin/users`
 - **THEN** the system allows access and renders the admin panel
+
+### Requirement: UpdateUserRequest model alignment
+The frontend `UpdateUserRequest` TypeScript interface SHALL include an optional `active: boolean` field to match the backend API contract for `PUT /api/users/{id}`.
+
+#### Scenario: Interface supports active status payload
+- **WHEN** components or services prepare a payload for updating a user's active state
+- **THEN** the `UpdateUserRequest` interface permits `{ active: boolean }` without TypeScript compilation errors
 

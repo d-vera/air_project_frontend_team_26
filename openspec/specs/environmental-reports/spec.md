@@ -1,10 +1,8 @@
 # environmental-reports Specification
 
 ## Purpose
-Provide registered users and administrators with an environmental reporting module to request historical data for monitoring stations, compare air quality trends across periods using overlay visualizations, inspect WHO stoplight compliance rates, and export structured PDF and Excel/CSV reports.
-
+TBD - created by archiving change environmental-reports. Update Purpose after archive.
 ## Requirements
-
 ### Requirement: Request Environmental Report Configuration
 The system SHALL provide a report configuration bar allowing authenticated users to select a monitoring station and a time period to request environmental telemetry.
 
@@ -79,3 +77,4 @@ The system SHALL restrict access to authenticated users (`authGuard`) and suppor
 #### Scenario: Bilingual display
 - **WHEN** the user changes the interface language between English and Spanish
 - **THEN** all report labels, metrics, chart axes, tooltips, and export metadata update dynamically to the selected language
+
