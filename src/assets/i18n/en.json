@@ -236,7 +236,8 @@
     "INACTIVE_BADGE": "Inactive",
     "MAINTENANCE_CONFIRM_TITLE": "Confirm Maintenance Mode",
     "MAINTENANCE_CONFIRM_MSG": "Setting station to MAINTENANCE will suspend automatic status transitions. Are you sure you want to proceed?",
-    "MAINTENANCE_CONFIRM_BTN": "Confirm Maintenance"
+    "MAINTENANCE_CONFIRM_BTN": "Confirm Maintenance",
+    "VIEW_DETAILS": "View Details"
   },
   "REPORTS": {
     "TITLE": "Environmental Reports",

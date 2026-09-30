@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { TranslateService, provideTranslateService } from '@ngx-translate/core';
 import { SensorMapComponent } from './sensor-map.component';
 import { Sensor } from '../../../models/sensor.model';
 
@@ -54,10 +55,34 @@ describe('SensorMapComponent', () => {
     }
   ];
 
+  let translate: TranslateService;
+
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SensorMapComponent]
+      imports: [SensorMapComponent],
+      providers: [provideTranslateService()]
     }).compileComponents();
+
+    translate = TestBed.inject(TranslateService);
+    translate.setTranslation('en', {
+      SENSOR: {
+        STATUS: 'Status',
+        STATUS_ONLINE: 'Online',
+        STATUS_OFFLINE: 'Offline',
+        STATUS_MAINTENANCE: 'Maintenance',
+        VIEW_DETAILS: 'View Details'
+      }
+    });
+    translate.setTranslation('es', {
+      SENSOR: {
+        STATUS: 'Estado',
+        STATUS_ONLINE: 'En Línea',
+        STATUS_OFFLINE: 'Desconectado',
+        STATUS_MAINTENANCE: 'Mantenimiento',
+        VIEW_DETAILS: 'Ver Detalles'
+      }
+    });
+    translate.use('en');
 
     fixture = TestBed.createComponent(SensorMapComponent);
     component = fixture.componentInstance;
@@ -86,7 +111,7 @@ describe('SensorMapComponent', () => {
   });
 
   describe('Legend', () => {
-    it('should display legend when showLegend is true', () => {
+    it('should display legend when showLegend is true in English', () => {
       component.showLegend = true;
       fixture.detectChanges();
       const compiled = fixture.nativeElement as HTMLElement;
@@ -94,6 +119,17 @@ describe('SensorMapComponent', () => {
       expect(compiled.textContent).toContain('Online');
       expect(compiled.textContent).toContain('Offline');
       expect(compiled.textContent).toContain('Maintenance');
+    });
+
+    it('should display legend in Spanish when language is switched to es', () => {
+      component.showLegend = true;
+      translate.use('es');
+      fixture.detectChanges();
+      const compiled = fixture.nativeElement as HTMLElement;
+      expect(compiled.textContent).toContain('Estado');
+      expect(compiled.textContent).toContain('En Línea');
+      expect(compiled.textContent).toContain('Desconectado');
+      expect(compiled.textContent).toContain('Mantenimiento');
     });
 
     it('should hide legend when showLegend is false', () => {

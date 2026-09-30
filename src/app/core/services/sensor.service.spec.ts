@@ -88,6 +88,30 @@ describe('SensorService', () => {
         expect(loading).toBe(false);
       });
     });
+
+    it('should pass includeInactive query param when includeInactive is true', () => {
+      service.getSensors(true, true).subscribe((sensors) => {
+        expect(sensors).toEqual([mockSensor, mockInactiveSensor]);
+      });
+
+      const req = httpTesting.expectOne('/api/sensors?includeInactive=true');
+      expect(req.request.method).toBe('GET');
+      expect(req.request.params.get('includeInactive')).toBe('true');
+      req.flush([mockSensor, mockInactiveSensor]);
+    });
+
+    it('should refetch if includeInactive changes even when refresh is false', () => {
+      service.getSensors(false, false).subscribe();
+      const req1 = httpTesting.expectOne('/api/sensors');
+      req1.flush([mockSensor]);
+
+      service.getSensors(false, true).subscribe((sensors) => {
+        expect(sensors).toEqual([mockSensor, mockInactiveSensor]);
+      });
+      const req2 = httpTesting.expectOne('/api/sensors?includeInactive=true');
+      expect(req2.request.method).toBe('GET');
+      req2.flush([mockSensor, mockInactiveSensor]);
+    });
   });
 
   describe('getSensorById', () => {
@@ -156,6 +180,23 @@ describe('SensorService', () => {
       // Verify sensor was removed from local state
       service.sensors$.subscribe((sensors) => {
         expect(sensors.find(s => s.id === 1)).toBeUndefined();
+      });
+    });
+
+    it('should mark sensor as inactive in local state when includeInactive was true', () => {
+      service.getSensors(true, true).subscribe();
+      httpTesting.expectOne('/api/sensors?includeInactive=true').flush([mockSensor]);
+
+      service.deleteSensor(1).subscribe();
+
+      const req = httpTesting.expectOne('/api/sensors/1');
+      expect(req.request.method).toBe('DELETE');
+      req.flush(null);
+
+      service.sensors$.subscribe((sensors) => {
+        const found = sensors.find(s => s.id === 1);
+        expect(found).toBeDefined();
+        expect(found?.active).toBe(false);
       });
     });
   });

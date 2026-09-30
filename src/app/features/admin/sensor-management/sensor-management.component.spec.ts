@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
-import { provideTranslateService } from '@ngx-translate/core';
+import { TranslateService, provideTranslateService } from '@ngx-translate/core';
 import { of, throwError } from 'rxjs';
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { SensorManagementComponent } from './sensor-management.component';
@@ -121,9 +121,28 @@ describe('SensorManagementComponent', () => {
   });
 
   it('should load sensors on init', () => {
-    expect(mockSensorService.getSensors).toHaveBeenCalledWith(true);
+    expect(mockSensorService.getSensors).toHaveBeenCalledWith(true, false);
     expect(component.sensors().length).toBe(3);
     expect(component.loading()).toBe(false);
+  });
+
+  describe('Inactive toggle', () => {
+    it('should reload sensors with includeInactive true when toggle is turned on', () => {
+      mockSensorService.getSensors.mockClear();
+      component.onToggleInactive(true);
+
+      expect(component.showInactive()).toBe(true);
+      expect(mockSensorService.getSensors).toHaveBeenCalledWith(true, true);
+    });
+
+    it('should reload sensors with includeInactive false when toggle is turned off', () => {
+      component.showInactive.set(true);
+      mockSensorService.getSensors.mockClear();
+      component.onToggleInactive(false);
+
+      expect(component.showInactive()).toBe(false);
+      expect(mockSensorService.getSensors).toHaveBeenCalledWith(true, false);
+    });
   });
 
   describe('Filtering', () => {
@@ -260,6 +279,48 @@ describe('SensorManagementComponent', () => {
     it('should switch to map view', () => {
       component.activeTab.set('map');
       expect(component.activeTab()).toBe('map');
+    });
+  });
+
+  describe('Status internationalization (i18n)', () => {
+    let translate: TranslateService;
+
+    beforeEach(() => {
+      translate = TestBed.inject(TranslateService);
+      translate.setTranslation('en', {
+        SENSOR: {
+          STATUS_ONLINE: 'Online',
+          STATUS_OFFLINE: 'Offline',
+          STATUS_MAINTENANCE: 'Maintenance'
+        }
+      });
+      translate.setTranslation('es', {
+        SENSOR: {
+          STATUS_ONLINE: 'En Línea',
+          STATUS_OFFLINE: 'Desconectado',
+          STATUS_MAINTENANCE: 'Mantenimiento'
+        }
+      });
+      translate.use('en');
+      component.showInactive.set(true);
+      fixture.detectChanges();
+    });
+
+    it('should render sensor status in English when language is en', () => {
+      translate.use('en');
+      fixture.detectChanges();
+      const compiled = fixture.nativeElement as HTMLElement;
+      expect(compiled.textContent).toContain('Online');
+      expect(compiled.textContent).toContain('Maintenance');
+    });
+
+    it('should render sensor status in Spanish when language is es', () => {
+      translate.use('es');
+      fixture.detectChanges();
+      const compiled = fixture.nativeElement as HTMLElement;
+      expect(compiled.textContent).toContain('En Línea');
+      expect(compiled.textContent).toContain('Desconectado');
+      expect(compiled.textContent).toContain('Mantenimiento');
     });
   });
 });

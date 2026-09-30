@@ -228,7 +228,7 @@
     "DELETE_BTN": "Desactivar Estación",
     "REACTIVATE_BTN": "Reactivar",
     "REACTIVATE_CONFIRM_TITLE": "Reactivar Sensor",
-    "REACTIVATE_CONFIRM_MSG": "¿Está seguro de que desea reactivar la estación \"{{name}}\" (UID: {{uid}})? Se marcará como OFFLINE hasta recibir un latido telemétrico.",
+    "REACTIVATE_CONFIRM_MSG": "¿Está seguro de que desea reactivar la estación \"{{name}}\" (UID: {{uid}})? Se marcará como desconectado (OFFLINE) hasta recibir un latido telemétrico.",
     "CANCEL_BTN": "Cancelar",
     "SAVE_BTN": "Guardar Sensor",
     "CREATE_BTN": "Registrar Estación",
@@ -236,7 +236,8 @@
     "INACTIVE_BADGE": "Inactivo",
     "MAINTENANCE_CONFIRM_TITLE": "Confirmar Modo Mantenimiento",
     "MAINTENANCE_CONFIRM_MSG": "Establecer la estación en MANTENIMIENTO suspenderá las transiciones automáticas de estado. ¿Está seguro de continuar?",
-    "MAINTENANCE_CONFIRM_BTN": "Confirmar Mantenimiento"
+    "MAINTENANCE_CONFIRM_BTN": "Confirmar Mantenimiento",
+    "VIEW_DETAILS": "Ver Detalles"
   },
   "REPORTS": {
     "TITLE": "Reportes Ambientales",

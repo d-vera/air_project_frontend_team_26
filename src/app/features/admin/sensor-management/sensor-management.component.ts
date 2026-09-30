@@ -106,7 +106,7 @@ import { SensorDialogComponent } from './sensor-dialog/sensor-dialog.component';
               <input
                 type="checkbox"
                 [ngModel]="showInactive()"
-                (ngModelChange)="showInactive.set($event)"
+                (ngModelChange)="onToggleInactive($event)"
                 class="sr-only"
               />
               <div
@@ -263,7 +263,7 @@ import { SensorDialogComponent } from './sensor-dialog/sensor-dialog.component';
                             'bg-rose-500': s.sensorStatus === 'OFFLINE',
                             'bg-amber-500': s.sensorStatus === 'MAINTENANCE'
                           }"></span>
-                          <span>{{ s.sensorStatus }}</span>
+                          <span>{{ ('SENSOR.STATUS_' + s.sensorStatus) | translate }}</span>
                         </span>
                       </td>
 
@@ -448,9 +448,14 @@ export class SensorManagementComponent implements OnInit {
     this.loadSensors();
   }
 
+  onToggleInactive(include: boolean): void {
+    this.showInactive.set(include);
+    this.loadSensors();
+  }
+
   loadSensors(): void {
     this.loading.set(true);
-    this.sensorService.getSensors(true).subscribe({
+    this.sensorService.getSensors(true, this.showInactive()).subscribe({
       next: (data) => {
         this.sensors.set(data);
         this.loading.set(false);

@@ -1,12 +1,14 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges, ElementRef, ViewChild, OnDestroy, signal } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges, ElementRef, ViewChild, OnDestroy, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { Subscription } from 'rxjs';
 import * as L from 'leaflet';
 import { Sensor, SensorStatus } from '../../../models/sensor.model';
 
 @Component({
   selector: 'app-sensor-map',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslatePipe],
   template: `
     <div class="relative w-full h-full min-h-[350px] rounded-xl overflow-hidden shadow-sm border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 flex flex-col">
       <!-- Leaflet Map Container -->
@@ -14,18 +16,18 @@ import { Sensor, SensorStatus } from '../../../models/sensor.model';
 
       <!-- Map Legend Overlay -->
       <div *ngIf="showLegend" class="absolute bottom-3 left-3 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md px-3 py-2 rounded-lg shadow border border-slate-200 dark:border-slate-800 text-xs text-slate-700 dark:text-slate-300 space-y-1.5 z-[1000] pointer-events-none">
-        <div class="font-semibold text-[11px] uppercase tracking-wider text-slate-500">Status</div>
+        <div class="font-semibold text-[11px] uppercase tracking-wider text-slate-500">{{ 'SENSOR.STATUS' | translate }}</div>
         <div class="flex items-center gap-2">
           <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block shadow-xs"></span>
-          <span>Online</span>
+          <span>{{ 'SENSOR.STATUS_ONLINE' | translate }}</span>
         </div>
         <div class="flex items-center gap-2">
           <span class="w-3 h-3 rounded-full bg-rose-500 inline-block shadow-xs"></span>
-          <span>Offline</span>
+          <span>{{ 'SENSOR.STATUS_OFFLINE' | translate }}</span>
         </div>
         <div class="flex items-center gap-2">
           <span class="w-3 h-3 rounded-full bg-amber-500 inline-block shadow-xs"></span>
-          <span>Maintenance</span>
+          <span>{{ 'SENSOR.STATUS_MAINTENANCE' | translate }}</span>
         </div>
       </div>
     </div>
@@ -68,9 +70,16 @@ export class SensorMapComponent implements OnInit, OnChanges, OnDestroy {
 
   private map: L.Map | null = null;
   private markersLayer: L.LayerGroup = L.layerGroup();
+  private translate = inject(TranslateService, { optional: true });
+  private langChangeSub?: Subscription;
 
   ngOnInit(): void {
     this.initMap();
+    if (this.translate) {
+      this.langChangeSub = this.translate.onLangChange.subscribe(() => {
+        this.updateMarkers();
+      });
+    }
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -80,6 +89,7 @@ export class SensorMapComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.langChangeSub?.unsubscribe();
     if (this.map) {
       this.map.remove();
       this.map = null;
@@ -162,13 +172,19 @@ export class SensorMapComponent implements OnInit, OnChanges, OnDestroy {
 
       const marker = L.marker([lat, lng], { icon, title: sensor.name });
 
+      const statusKey = 'SENSOR.STATUS_' + sensor.sensorStatus;
+      const statusText = (this.translate ? this.translate.instant(statusKey) : sensor.sensorStatus) || sensor.sensorStatus;
+      const resolvedStatus = statusText !== statusKey ? statusText : sensor.sensorStatus;
+      const viewDetailsText = (this.translate ? this.translate.instant('SENSOR.VIEW_DETAILS') : 'View Details') || 'View Details';
+      const resolvedBtnText = viewDetailsText !== 'SENSOR.VIEW_DETAILS' ? viewDetailsText : 'View Details';
+
       const popupContent = document.createElement('div');
       popupContent.className = 'p-1 min-w-[200px] text-slate-100';
       popupContent.innerHTML = `
         <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid #334155; padding-bottom: 6px; margin-bottom: 8px;">
           <strong style="font-size: 13px; color: #fff;">${sensor.name}</strong>
           <span style="font-size: 10px; font-weight: bold; text-transform: uppercase; padding: 2px 6px; border-radius: 9999px; background: ${color}25; color: ${color}; border: 1px solid ${color}60;">
-            ${sensor.sensorStatus}
+            ${resolvedStatus}
           </span>
         </div>
         <div style="font-size: 11px; line-height: 1.5; color: #cbd5e1;">
@@ -186,7 +202,7 @@ export class SensorMapComponent implements OnInit, OnChanges, OnDestroy {
         btnContainer.style.borderTop = '1px solid #334155';
 
         const selectBtn = document.createElement('button');
-        selectBtn.textContent = 'View Details';
+        selectBtn.textContent = resolvedBtnText;
         selectBtn.style.width = '100%';
         selectBtn.style.padding = '4px 8px';
         selectBtn.style.fontSize = '11px';

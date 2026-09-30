@@ -16,12 +16,16 @@ export class SensorService {
   private loadingSubject = new BehaviorSubject<boolean>(false);
   public loading$ = this.loadingSubject.asObservable();
 
-  getSensors(refresh = false): Observable<Sensor[]> {
-    if (refresh || this.sensorsSubject.value.length === 0) {
+  private lastIncludeInactive = false;
+
+  getSensors(refresh = false, includeInactive = false): Observable<Sensor[]> {
+    if (refresh || this.sensorsSubject.value.length === 0 || this.lastIncludeInactive !== includeInactive) {
       this.loadingSubject.next(true);
-      return this.http.get<Sensor[]>(this.baseUrl).pipe(
+      const options = includeInactive ? { params: { includeInactive: true } } : {};
+      return this.http.get<Sensor[]>(this.baseUrl, options).pipe(
         tap({
           next: (sensors) => {
+            this.lastIncludeInactive = includeInactive;
             this.sensorsSubject.next(sensors);
             this.loadingSubject.next(false);
           },
@@ -63,7 +67,13 @@ export class SensorService {
     return this.http.delete<void>(`${this.baseUrl}/${id}`).pipe(
       tap(() => {
         const current = this.sensorsSubject.value;
-        this.sensorsSubject.next(current.filter(s => s.id !== id));
+        if (this.lastIncludeInactive) {
+          this.sensorsSubject.next(
+            current.map(s => (s.id === id ? { ...s, active: false } : s))
+          );
+        } else {
+          this.sensorsSubject.next(current.filter(s => s.id !== id));
+        }
       })
     );
   }
