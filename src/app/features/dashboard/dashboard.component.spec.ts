@@ -3,13 +3,15 @@ import { provideRouter } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideTranslateService } from '@ngx-translate/core';
-import { of, throwError } from 'rxjs';
+import { of, throwError, Subject } from 'rxjs';
 import { DashboardComponent } from './dashboard.component';
 import { AuthService } from '../../core/services/auth.service';
 import { SensorService } from '../../core/services/sensor.service';
 import { AirQualityService } from '../../core/services/air-quality.service';
+import { RealtimeService } from '../../core/services/realtime.service';
 import { UserService } from '../../core/services/user.service';
 import { Sensor } from '../../models/sensor.model';
+import { AirQualityReadingNotification, SensorStatusNotification } from '../../models/websocket.model';
 
 describe('DashboardComponent', () => {
   let component: DashboardComponent;
@@ -18,6 +20,9 @@ describe('DashboardComponent', () => {
   let mockSensorService: any;
   let mockAirQualityService: any;
   let mockUserService: any;
+  let mockRealtimeService: any;
+  let readingsSubject: Subject<AirQualityReadingNotification>;
+  let sensorStatusSubject: Subject<SensorStatusNotification>;
 
   const mockSensors: Sensor[] = [
     {
@@ -68,6 +73,9 @@ describe('DashboardComponent', () => {
   ];
 
   beforeEach(async () => {
+    readingsSubject = new Subject<AirQualityReadingNotification>();
+    sensorStatusSubject = new Subject<SensorStatusNotification>();
+
     mockAuthService = {
       isAuthenticated: vi.fn().mockReturnValue(false),
       isAdmin: vi.fn().mockReturnValue(false),
@@ -79,7 +87,8 @@ describe('DashboardComponent', () => {
     mockSensorService = {
       getSensors: vi.fn().mockReturnValue(of(mockSensors)),
       getSensorsStream: vi.fn().mockReturnValue(of(mockSensors)),
-      sensors$: of(mockSensors)
+      sensors$: of(mockSensors),
+      handleStatusNotification: vi.fn()
     };
 
     mockAirQualityService = {
@@ -89,6 +98,11 @@ describe('DashboardComponent', () => {
 
     mockUserService = {
       getCurrentUser: vi.fn().mockReturnValue(of(null))
+    };
+
+    mockRealtimeService = {
+      readings$: readingsSubject.asObservable(),
+      sensorStatus$: sensorStatusSubject.asObservable()
     };
 
     await TestBed.configureTestingModule({
@@ -101,7 +115,8 @@ describe('DashboardComponent', () => {
         { provide: AuthService, useValue: mockAuthService },
         { provide: SensorService, useValue: mockSensorService },
         { provide: AirQualityService, useValue: mockAirQualityService },
-        { provide: UserService, useValue: mockUserService }
+        { provide: UserService, useValue: mockUserService },
+        { provide: RealtimeService, useValue: mockRealtimeService }
       ]
     }).compileComponents();
 
@@ -138,4 +153,50 @@ describe('DashboardComponent', () => {
     component.onMapSensorSelected(mockSensors[0]);
     expect(spy).toHaveBeenCalledWith('ACEA5AC8E720');
   });
+
+  it('should update current readings when realtime reading notification is received', () => {
+    fixture.detectChanges();
+    readingsSubject.next({
+      action: 'INSERT',
+      id: 100,
+      sensorUid: 'ACEA5AC8E720',
+      deviceName: 'Central Station',
+      timestamp: '2026-10-05T20:00:00Z',
+      temperature: 28.5,
+      humidity: 55.0,
+      co2: 450.0,
+      pm10Small: 5.0,
+      pm25: 12.0,
+      pm10: 18.0
+    });
+
+    const readings = component.currentReadings();
+    const updated = readings.find(r => r.deviceId === 'ACEA5AC8E720');
+    expect(updated).toBeTruthy();
+    expect(updated?.temperature).toBe(28.5);
+    expect(updated?.co2).toBe(450.0);
+  });
+
+  it('should delegate sensor status updates to SensorService when notification received', () => {
+    fixture.detectChanges();
+    sensorStatusSubject.next({
+      sensorId: 1,
+      uidSensor: 'ACEA5AC8E720',
+      name: 'Central Sensor',
+      previousStatus: 'ONLINE',
+      newStatus: 'MAINTENANCE',
+      active: true,
+      lastSeen: '2026-10-05T20:10:00Z'
+    });
+
+    expect(mockSensorService.handleStatusNotification).toHaveBeenCalledWith({
+      sensorId: 1,
+      uidSensor: 'ACEA5AC8E720',
+      name: 'Central Sensor',
+      newStatus: 'MAINTENANCE',
+      active: true,
+      lastSeen: '2026-10-05T20:10:00Z'
+    });
+  });
 });
+

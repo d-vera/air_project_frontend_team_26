@@ -1,5 +1,7 @@
 export const environment = {
   production: true,
   googleMapsApiKey: '',
-  apiBaseUrl: ''
+  apiBaseUrl: '',
+  wsUrl: '/ws'
 };
+

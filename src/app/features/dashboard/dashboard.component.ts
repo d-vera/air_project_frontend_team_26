@@ -1,23 +1,27 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, OnDestroy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
+import { Subscription } from 'rxjs';
 import { UserService } from '../../core/services/user.service';
 import { AuthService } from '../../core/services/auth.service';
 import { AirQualityService } from '../../core/services/air-quality.service';
+import { SensorService } from '../../core/services/sensor.service';
+import { RealtimeService } from '../../core/services/realtime.service';
 import { User } from '../../models/user.model';
 import {
   AirQualityReading,
   TimeRangeShortcut,
   CustomDateRange
 } from '../../models/air-quality.model';
-import { SensorService } from '../../core/services/sensor.service';
+import { AirQualityReadingNotification, SensorStatusNotification } from '../../models/websocket.model';
 import { Sensor } from '../../models/sensor.model';
 import { RealTimeCardsComponent } from './components/real-time-cards/real-time-cards.component';
 import { StoplightIndicatorComponent } from './components/stoplight-indicator/stoplight-indicator.component';
 import { HistoricalChartComponent } from './components/historical-chart/historical-chart.component';
 import { LoginPromptModalComponent } from '../../shared/components/login-prompt-modal/login-prompt-modal.component';
 import { SensorMapComponent } from '../../shared/components/sensor-map/sensor-map.component';
+
 
 @Component({
   selector: 'app-dashboard',
@@ -179,11 +183,14 @@ import { SensorMapComponent } from '../../shared/components/sensor-map/sensor-ma
     </div>
   `
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, OnDestroy {
   private userService = inject(UserService);
   private airQualityService = inject(AirQualityService);
   private sensorService = inject(SensorService);
+  private realtimeService = inject(RealtimeService);
   authService = inject(AuthService);
+
+  private subscriptions = new Subscription();
 
   user = signal<User | null>(null);
 
@@ -217,7 +224,82 @@ export class DashboardComponent implements OnInit {
     this.loadSensors();
     this.loadCurrentData();
     this.loadHistoricalData();
+    this.setupRealtimeSubscriptions();
   }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
+  }
+
+  private setupRealtimeSubscriptions(): void {
+    // 1. Subscribe to air quality readings
+    this.subscriptions.add(
+      this.realtimeService.readings$.subscribe((notification: AirQualityReadingNotification) => {
+        this.handleRealtimeReading(notification);
+      })
+    );
+
+    // 2. Subscribe to sensor status & lifecycle changes
+    this.subscriptions.add(
+      this.realtimeService.sensorStatus$.subscribe((statusNotif: SensorStatusNotification) => {
+        this.sensorService.handleStatusNotification({
+          sensorId: statusNotif.sensorId,
+          uidSensor: statusNotif.uidSensor,
+          name: statusNotif.name,
+          newStatus: statusNotif.newStatus,
+          active: statusNotif.active,
+          lastSeen: statusNotif.lastSeen
+        });
+      })
+    );
+
+    // Also observe sensor changes from sensorService to keep map & device list reactive
+    this.subscriptions.add(
+      this.sensorService.sensors$.subscribe((sensorsList) => {
+        if (sensorsList && sensorsList.length > 0) {
+          this.sensors.set(sensorsList);
+        }
+      })
+    );
+  }
+
+  private handleRealtimeReading(notification: AirQualityReadingNotification): void {
+    const reading: AirQualityReading = {
+      deviceId: notification.sensorUid,
+      deviceName: notification.deviceName || notification.sensorUid,
+      time: notification.timestamp,
+      temperature: notification.temperature,
+      humidity: notification.humidity,
+      co2: notification.co2,
+      pm1_0: notification.pm10Small ?? 0,
+      pm2_5: notification.pm25 ?? 0,
+      pm10: notification.pm10 ?? 0
+    };
+
+    // Update currentReadings signal
+    const current = this.currentReadings();
+    const index = current.findIndex(r => r.deviceId === reading.deviceId);
+
+    let updated: AirQualityReading[];
+    if (index !== -1) {
+      updated = [...current];
+      updated[index] = reading;
+    } else {
+      updated = [reading, ...current];
+    }
+    this.currentReadings.set(updated);
+
+    // Update deviceList if new device arrived
+    const devices = Array.from(new Set(updated.map(r => r.deviceId)));
+    this.deviceList.set(devices);
+
+    // If reading is for the currently selected device, update/append to historical chart
+    if (!this.selectedDeviceId() || this.selectedDeviceId() === reading.deviceId) {
+      const historical = this.historicalReadings();
+      this.historicalReadings.set([...historical, reading]);
+    }
+  }
+
 
   loadSensors(): void {
     this.sensorService.getSensors().subscribe({

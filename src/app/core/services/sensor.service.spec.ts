@@ -271,4 +271,63 @@ describe('SensorService', () => {
       });
     });
   });
+
+  describe('handleStatusNotification', () => {
+    it('should update existing sensor status and active properties', () => {
+      service.getSensors(true, true).subscribe();
+      httpTesting.expectOne('/api/sensors?includeInactive=true').flush([mockSensor]);
+
+      service.handleStatusNotification({
+        sensorId: 1,
+        uidSensor: 'ACEA5AC8E720',
+        name: 'Sensor Patio Central',
+        newStatus: 'MAINTENANCE',
+        active: true,
+        lastSeen: '2026-10-05T20:00:00Z'
+      });
+
+      service.sensors$.subscribe((sensors) => {
+        const updated = sensors.find(s => s.id === 1);
+        expect(updated?.sensorStatus).toBe('MAINTENANCE');
+        expect(updated?.lastSeen).toBe('2026-10-05T20:00:00Z');
+      });
+    });
+
+    it('should remove sensor if active is false and includeInactive is false', () => {
+      service.getSensors(true, false).subscribe();
+      httpTesting.expectOne('/api/sensors').flush([mockSensor]);
+
+      service.handleStatusNotification({
+        sensorId: 1,
+        uidSensor: 'ACEA5AC8E720',
+        newStatus: 'OFFLINE',
+        active: false
+      });
+
+      service.sensors$.subscribe((sensors) => {
+        expect(sensors.length).toBe(0);
+      });
+    });
+
+    it('should add sensor if not currently in list and active is true', () => {
+      service.getSensors(true, false).subscribe();
+      httpTesting.expectOne('/api/sensors').flush([]);
+
+      service.handleStatusNotification({
+        sensorId: 99,
+        uidSensor: 'NEW_STATION',
+        name: 'New Sensor Station',
+        newStatus: 'ONLINE',
+        active: true,
+        lastSeen: '2026-10-05T20:00:00Z'
+      });
+
+      service.sensors$.subscribe((sensors) => {
+        expect(sensors.length).toBe(1);
+        expect(sensors[0].uidSensor).toBe('NEW_STATION');
+        expect(sensors[0].sensorStatus).toBe('ONLINE');
+      });
+    });
+  });
 });
+

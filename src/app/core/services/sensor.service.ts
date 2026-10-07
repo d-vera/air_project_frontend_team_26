@@ -93,4 +93,58 @@ export class SensorService {
       })
     );
   }
+
+  /**
+   * Applies real-time sensor status and lifecycle updates from WebSocket notification
+   */
+  handleStatusNotification(notification: {
+    sensorId: number;
+    uidSensor: string;
+    name?: string;
+    newStatus: Sensor['sensorStatus'];
+    active: boolean;
+    lastSeen?: string;
+  }): void {
+    const current = this.sensorsSubject.value;
+    const index = current.findIndex(s => s.id === notification.sensorId || s.uidSensor === notification.uidSensor);
+
+    if (index !== -1) {
+      const existing = current[index];
+      const updated: Sensor = {
+        ...existing,
+        name: notification.name || existing.name,
+        sensorStatus: notification.newStatus,
+        active: notification.active,
+        lastSeen: notification.lastSeen || existing.lastSeen
+      };
+
+      if (!notification.active && !this.lastIncludeInactive) {
+        // Remove from list if inactive and we are not viewing inactive sensors
+        this.sensorsSubject.next(current.filter((_, i) => i !== index));
+      } else {
+        const updatedList = [...current];
+        updatedList[index] = updated;
+        this.sensorsSubject.next(updatedList);
+      }
+    } else if (notification.active || this.lastIncludeInactive) {
+      // New sensor or newly visible sensor
+      const newSensor: Sensor = {
+        id: notification.sensorId,
+        uidSensor: notification.uidSensor,
+        name: notification.name || notification.uidSensor,
+        sensorType: 'ESP32_AIR',
+        latitude: 0,
+        longitude: 0,
+        firmwareVersion: '1.0.0',
+        sensorStatus: notification.newStatus,
+        lastSeen: notification.lastSeen || new Date().toISOString(),
+        userId: null,
+        active: notification.active,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      this.sensorsSubject.next([...current, newSensor]);
+    }
+  }
 }
+

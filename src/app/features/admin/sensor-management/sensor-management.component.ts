@@ -1,12 +1,16 @@
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
+import { Subscription } from 'rxjs';
 import { SensorService } from '../../../core/services/sensor.service';
+import { RealtimeService } from '../../../core/services/realtime.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { Sensor, SensorStatus, CreateSensorRequest, UpdateSensorRequest } from '../../../models/sensor.model';
+import { SensorStatusNotification } from '../../../models/websocket.model';
 import { SensorMapComponent } from '../../../shared/components/sensor-map/sensor-map.component';
 import { SensorDialogComponent } from './sensor-dialog/sensor-dialog.component';
+
 
 @Component({
   selector: 'app-sensor-management',
@@ -407,9 +411,12 @@ import { SensorDialogComponent } from './sensor-dialog/sensor-dialog.component';
     </div>
   `
 })
-export class SensorManagementComponent implements OnInit {
+export class SensorManagementComponent implements OnInit, OnDestroy {
   private sensorService = inject(SensorService);
+  private realtimeService = inject(RealtimeService);
   authService = inject(AuthService);
+
+  private subscriptions = new Subscription();
 
   sensors = signal<Sensor[]>([]);
   loading = signal<boolean>(true);
@@ -446,7 +453,38 @@ export class SensorManagementComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadSensors();
+    this.setupRealtimeSubscriptions();
   }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
+  }
+
+  private setupRealtimeSubscriptions(): void {
+    // 1. Listen for sensor status & lifecycle notifications over WebSocket
+    this.subscriptions.add(
+      this.realtimeService.sensorStatus$.subscribe((statusNotif: SensorStatusNotification) => {
+        this.sensorService.handleStatusNotification({
+          sensorId: statusNotif.sensorId,
+          uidSensor: statusNotif.uidSensor,
+          name: statusNotif.name,
+          newStatus: statusNotif.newStatus,
+          active: statusNotif.active,
+          lastSeen: statusNotif.lastSeen
+        });
+      })
+    );
+
+    // 2. Reactively reflect any sensor changes from SensorService into component signal
+    this.subscriptions.add(
+      this.sensorService.sensors$.subscribe((sensorsList) => {
+        if (sensorsList) {
+          this.sensors.set(sensorsList);
+        }
+      })
+    );
+  }
+
 
   onToggleInactive(include: boolean): void {
     this.showInactive.set(include);

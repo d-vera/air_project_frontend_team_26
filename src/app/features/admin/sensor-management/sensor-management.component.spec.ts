@@ -5,6 +5,7 @@ import { of, throwError } from 'rxjs';
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { SensorManagementComponent } from './sensor-management.component';
 import { SensorService } from '../../../core/services/sensor.service';
+import { RealtimeService } from '../../../core/services/realtime.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { Sensor, CreateSensorRequest, UpdateSensorRequest } from '../../../models/sensor.model';
 
@@ -35,17 +36,12 @@ class MockSensorDialogComponent {
 describe('SensorManagementComponent', () => {
   let component: SensorManagementComponent;
   let fixture: ComponentFixture<SensorManagementComponent>;
-  let mockSensorService: {
-    getSensors: ReturnType<typeof vi.fn>;
-    createSensor: ReturnType<typeof vi.fn>;
-    updateSensor: ReturnType<typeof vi.fn>;
-    deleteSensor: ReturnType<typeof vi.fn>;
-    reactivateSensor: ReturnType<typeof vi.fn>;
-  };
+  let mockSensorService: any;
   let mockAuthService: {
     isAdmin: ReturnType<typeof vi.fn>;
     isAuthenticated: ReturnType<typeof vi.fn>;
   };
+
 
   const activeSensor: Sensor = {
     id: 1,
@@ -82,16 +78,25 @@ describe('SensorManagementComponent', () => {
 
   beforeEach(() => {
     mockSensorService = {
+      sensors$: of([activeSensor, inactiveSensor, maintenanceSensor]),
       getSensors: vi.fn().mockReturnValue(of([activeSensor, inactiveSensor, maintenanceSensor])),
       createSensor: vi.fn().mockReturnValue(of(activeSensor)),
       updateSensor: vi.fn().mockReturnValue(of(activeSensor)),
       deleteSensor: vi.fn().mockReturnValue(of(void 0)),
-      reactivateSensor: vi.fn().mockReturnValue(of({ ...inactiveSensor, active: true, sensorStatus: 'OFFLINE' }))
+      reactivateSensor: vi.fn().mockReturnValue(of({ ...inactiveSensor, active: true, sensorStatus: 'OFFLINE' })),
+      handleStatusNotification: vi.fn()
     };
 
     mockAuthService = {
       isAdmin: vi.fn().mockReturnValue(true),
       isAuthenticated: vi.fn().mockReturnValue(true)
+    };
+
+    const mockRealtimeService = {
+      sensorStatus$: of(),
+      readings$: of(),
+      activate: vi.fn(),
+      deactivate: vi.fn()
     };
 
     TestBed.configureTestingModule({
@@ -104,12 +109,14 @@ describe('SensorManagementComponent', () => {
       providers: [
         provideTranslateService(),
         { provide: SensorService, useValue: mockSensorService },
-        { provide: AuthService, useValue: mockAuthService }
+        { provide: AuthService, useValue: mockAuthService },
+        { provide: RealtimeService, useValue: mockRealtimeService }
       ]
     }).overrideComponent(SensorManagementComponent, {
       remove: { imports: [] },
       add: { imports: [MockSensorMapComponent, MockSensorDialogComponent] }
     });
+
 
     fixture = TestBed.createComponent(SensorManagementComponent);
     component = fixture.componentInstance;
