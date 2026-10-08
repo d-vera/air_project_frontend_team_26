@@ -2,9 +2,7 @@
 
 ## Purpose
 Provide real-time air quality metric visualization and historical trend analysis across multiple metrics and time ranges with role-based access control.
-
 ## Requirements
-
 ### Requirement: Real-time air quality metric display
 The system SHALL display current real-time air quality metrics for connected devices, including Temperature (°C), Humidity (%), CO2 (ppm), PM1.0 (µg/m³), PM2.5 (µg/m³), and PM10 (µg/m³).
 
@@ -81,4 +79,11 @@ The system SHALL display an interactive map section or toggle on the air quality
 #### Scenario: User views sensors on dashboard map
 - **WHEN** a user navigates to the dashboard and interacts with the map view
 - **THEN** the map displays all active sensor stations with visual status indicators and allows selecting a sensor to focus its real-time air quality metrics.
+
+### Requirement: Real-time air quality telemetry ingestion
+The system SHALL ingest live air quality reading notifications emitted over WebSockets and dynamically update dashboard telemetry metrics, sensor device lists, and stoplight health indicators without requiring manual page refresh.
+
+#### Scenario: Live reading updates current metrics
+- **WHEN** a real-time air quality reading notification is received for an existing or new sensor device
+- **THEN** the dashboard updates the matching metric reading in `currentReadings` (or appends it if new), refreshes available device list options, and updates the active stoplight evaluation.
 
