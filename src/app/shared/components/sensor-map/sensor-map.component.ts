@@ -57,7 +57,7 @@ import { Sensor, SensorStatus } from '../../../models/sensor.model';
 export class SensorMapComponent implements OnInit, OnChanges, OnDestroy {
   @Input() sensors: Sensor[] = [];
   @Input() selectedSensorId: number | null = null;
-  @Input() center: { lat: number; lng: number } = { lat: -12.046374, lng: -77.042793 };
+  @Input() center: { lat: number; lng: number } = { lat: -17.3935, lng: -66.1570 };
   @Input() zoom = 12;
   @Input() showLegend = true;
   @Input() showSelectButton = false;
@@ -105,11 +105,10 @@ export class SensorMapComponent implements OnInit, OnChanges, OnDestroy {
       zoomControl: true
     });
 
-    // Dark-themed tiles matching the UI aesthetics (CartoDB Dark Matter with OSM fallback)
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
-      subdomains: 'abcd',
-      maxZoom: 20
+    // OpenStreetMap tiles (free and open source, no API key required)
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      maxZoom: 19
     }).addTo(this.map);
 
     this.markersLayer.addTo(this.map);

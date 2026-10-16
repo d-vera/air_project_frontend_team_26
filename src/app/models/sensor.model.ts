@@ -5,8 +5,8 @@ export interface Sensor {
   uidSensor: string;           // Hardware MAC / Device ID (e.g. "ACEA5AC8E720")
   name: string;                // Station name (e.g. "Sensor Patio Central")
   sensorType: string;          // Default: "ESP32_AIR"
-  latitude: number;            // e.g. -12.046374 (Double)
-  longitude: number;           // e.g. -77.042793 (Double)
+  latitude: number;            // e.g. -17.393500 (Double)
+  longitude: number;           // e.g. -66.157000 (Double)
   firmwareVersion: string;     // e.g. "1.0.2"
   sensorStatus: SensorStatus;  // "ONLINE" | "OFFLINE" | "MAINTENANCE"
   lastSeen: string | null;     // ISO timestamp (e.g. "2026-08-16T15:18:00Z")

@@ -132,7 +132,7 @@ import { MapCoordinatePickerComponent } from '../../../../shared/components/map-
                   type="number"
                   step="any"
                   formControlName="latitude"
-                  placeholder="-12.046374"
+                  placeholder="-17.393500"
                   class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono"
                 />
               </div>
@@ -145,7 +145,7 @@ import { MapCoordinatePickerComponent } from '../../../../shared/components/map-
                   type="number"
                   step="any"
                   formControlName="longitude"
-                  placeholder="-77.042793"
+                  placeholder="-66.157000"
                   class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono"
                 />
               </div>
@@ -250,8 +250,8 @@ export class SensorDialogComponent implements OnInit {
       sensorType: [this.sensor?.sensorType || 'ESP32_AIR'],
       firmwareVersion: [this.sensor?.firmwareVersion || '1.0.0'],
       sensorStatus: [this.sensor?.sensorStatus || 'ONLINE'],
-      latitude: [this.sensor?.latitude ?? -12.046374, [Validators.required]],
-      longitude: [this.sensor?.longitude ?? -77.042793, [Validators.required]]
+      latitude: [this.sensor?.latitude ?? -17.3935, [Validators.required]],
+      longitude: [this.sensor?.longitude ?? -66.1570, [Validators.required]]
     });
   }
 

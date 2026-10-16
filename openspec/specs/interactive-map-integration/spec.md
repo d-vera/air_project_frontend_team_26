@@ -1,16 +1,20 @@
 # interactive-map-integration Specification
 
 ## Purpose
-Render interactive geospatial map components using Leaflet and OpenStreetMap/Carto tiles for sensor station status visualization, popups, and coordinate selection.
+Render interactive geospatial map components using Leaflet and OpenStreetMap tiles for sensor station status visualization, popups, and coordinate selection.
 
 ## Requirements
 
 ### Requirement: Interactive Leaflet map sensor visualization
-The system SHALL render an interactive Leaflet map (using OpenStreetMap/Carto tiles) displaying sensor markers positioned at their geographic coordinates (`latitude`, `longitude`).
+The system SHALL render an interactive Leaflet map (using OpenStreetMap tiles) displaying sensor markers positioned at their geographic coordinates (`latitude`, `longitude`). Maps and coordinate pickers SHALL default their geographic center to Cochabamba, Bolivia (`-17.3935`, `-66.1570`).
 
 #### Scenario: Display sensor markers on map
 - **WHEN** the interactive map view is rendered
 - **THEN** the system places custom markers on the Leaflet map for all active sensors based on their coordinates.
+
+#### Scenario: Default map center
+- **WHEN** the map view or coordinate picker initializes without predefined coordinates
+- **THEN** the map centers on Cochabamba, Bolivia (`-17.3935`, `-66.1570`).
 
 #### Scenario: Color-coded marker status
 - **WHEN** sensor markers are rendered on the map

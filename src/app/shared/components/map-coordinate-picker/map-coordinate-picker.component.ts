@@ -31,8 +31,8 @@ import * as L from 'leaflet';
   `]
 })
 export class MapCoordinatePickerComponent implements OnInit, OnChanges, OnDestroy {
-  @Input() latitude = -12.046374;
-  @Input() longitude = -77.042793;
+  @Input() latitude = -17.3935;
+  @Input() longitude = -66.1570;
   @Input() zoom = 14;
 
   @Output() coordinatesChange = new EventEmitter<{ latitude: number; longitude: number }>();
@@ -62,8 +62,8 @@ export class MapCoordinatePickerComponent implements OnInit, OnChanges, OnDestro
   private initMap(): void {
     if (this.map || !this.mapContainer?.nativeElement) return;
 
-    const lat = typeof this.latitude === 'number' && !isNaN(this.latitude) ? this.latitude : -12.046374;
-    const lng = typeof this.longitude === 'number' && !isNaN(this.longitude) ? this.longitude : -77.042793;
+    const lat = typeof this.latitude === 'number' && !isNaN(this.latitude) ? this.latitude : -17.3935;
+    const lng = typeof this.longitude === 'number' && !isNaN(this.longitude) ? this.longitude : -66.1570;
 
     this.map = L.map(this.mapContainer.nativeElement, {
       center: [lat, lng],
@@ -72,9 +72,9 @@ export class MapCoordinatePickerComponent implements OnInit, OnChanges, OnDestro
       attributionControl: false
     });
 
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-      subdomains: 'abcd',
-      maxZoom: 20
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(this.map);
 
     const markerHtml = `

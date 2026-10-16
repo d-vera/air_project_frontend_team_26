@@ -27,8 +27,8 @@ describe('SensorDialogComponent', () => {
     uidSensor: 'ACEA5AC8E720',
     name: 'Sensor Patio Central',
     sensorType: 'ESP32_AIR',
-    latitude: -12.046374,
-    longitude: -77.042793,
+    latitude: -17.393500,
+    longitude: -66.157000,
     firmwareVersion: '1.0.2',
     sensorStatus: 'ONLINE',
     lastSeen: '2026-08-16T15:18:00Z',
@@ -71,6 +71,8 @@ describe('SensorDialogComponent', () => {
       expect(component.sensorForm.get('name')?.value).toBe('');
       expect(component.sensorForm.get('sensorType')?.value).toBe('ESP32_AIR');
       expect(component.sensorForm.get('sensorStatus')?.value).toBe('ONLINE');
+      expect(component.sensorForm.get('latitude')?.value).toBe(-17.3935);
+      expect(component.sensorForm.get('longitude')?.value).toBe(-66.1570);
     });
 
     it('should emit save event with CreateSensorRequest on valid form submit', () => {
@@ -117,7 +119,7 @@ describe('SensorDialogComponent', () => {
     it('should initialize the form with sensor values', () => {
       expect(component.sensorForm.get('name')?.value).toBe('Sensor Patio Central');
       expect(component.sensorForm.get('sensorStatus')?.value).toBe('ONLINE');
-      expect(component.sensorForm.get('latitude')?.value).toBe(-12.046374);
+      expect(component.sensorForm.get('latitude')?.value).toBe(-17.393500);
     });
 
     it('should emit save event with UpdateSensorRequest on valid form submit', () => {

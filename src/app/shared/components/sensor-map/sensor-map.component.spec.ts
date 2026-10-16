@@ -13,8 +13,8 @@ describe('SensorMapComponent', () => {
       uidSensor: 'ACEA5AC8E720',
       name: 'Sensor 1',
       sensorType: 'ESP32_AIR',
-      latitude: -12.046374,
-      longitude: -77.042793,
+      latitude: -17.393500,
+      longitude: -66.157000,
       firmwareVersion: '1.0.2',
       sensorStatus: 'ONLINE',
       lastSeen: new Date().toISOString(),
@@ -28,8 +28,8 @@ describe('SensorMapComponent', () => {
       uidSensor: 'B189DF621C11',
       name: 'Sensor 2',
       sensorType: 'ESP32_AIR',
-      latitude: -12.05211,
-      longitude: -77.03652,
+      latitude: -17.376200,
+      longitude: -66.152800,
       firmwareVersion: '1.0.1',
       sensorStatus: 'OFFLINE',
       lastSeen: new Date().toISOString(),
@@ -43,8 +43,8 @@ describe('SensorMapComponent', () => {
       uidSensor: 'C993AF718223',
       name: 'Sensor 3',
       sensorType: 'ESP32_AIR',
-      latitude: -12.06145,
-      longitude: -77.04891,
+      latitude: -17.411000,
+      longitude: -66.162000,
       firmwareVersion: '1.0.0',
       sensorStatus: 'MAINTENANCE',
       lastSeen: null,
@@ -90,6 +90,10 @@ describe('SensorMapComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should default map center to Cochabamba, Bolivia (-17.3935, -66.1570)', () => {
+    expect(component.center).toEqual({ lat: -17.3935, lng: -66.1570 });
   });
 
   describe('getStatusColor', () => {
