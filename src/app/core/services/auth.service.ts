@@ -1,6 +1,6 @@
 import { Injectable, signal, inject, Injector } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Observable, tap, catchError, of, throwError, map } from 'rxjs';
 import { LoginRequest, RegisterRequest, AuthResponse } from '../../models/auth.model';
 import { UserRole } from '../../models/user.model';
 import { UserService } from './user.service';
@@ -40,9 +40,34 @@ export class AuthService {
 
   register(data: RegisterRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>('/api/auth/register', data).pipe(
+      catchError((err: HttpErrorResponse) => {
+        // If server returns 2xx status (e.g. 200/201 with plain text or empty body causing JSON parse error), treat as success
+        if (err.status >= 200 && err.status < 300) {
+          return of({
+            token: '',
+            tokenType: '',
+            email: data.email,
+            role: 'REGISTERED_USER' as UserRole
+          } as AuthResponse);
+        }
+        return throwError(() => err);
+      }),
+      map((res: any) => {
+        if (typeof res === 'string' || !res || typeof res !== 'object') {
+          return {
+            token: '',
+            tokenType: '',
+            email: data.email,
+            role: 'REGISTERED_USER' as UserRole
+          } as AuthResponse;
+        }
+        return res;
+      }),
       tap(res => {
-        this.saveAuthData(res);
-        this.loadUserPreferences();
+        if (res && res.token) {
+          this.saveAuthData(res);
+          this.loadUserPreferences();
+        }
       })
     );
   }
@@ -98,13 +123,19 @@ export class AuthService {
   }
 
   private saveAuthData(response: AuthResponse): void {
-    localStorage.setItem(this.TOKEN_KEY, response.token);
-    if (response.role) localStorage.setItem(this.ROLE_KEY, response.role);
-    if (response.email) localStorage.setItem(this.EMAIL_KEY, response.email);
-
-    this.token.set(response.token);
-    this.role.set(response.role);
-    this.email.set(response.email);
+    if (!response) return;
+    if (response.token) {
+      localStorage.setItem(this.TOKEN_KEY, response.token);
+      this.token.set(response.token);
+    }
+    if (response.role) {
+      localStorage.setItem(this.ROLE_KEY, response.role);
+      this.role.set(response.role);
+    }
+    if (response.email) {
+      localStorage.setItem(this.EMAIL_KEY, response.email);
+      this.email.set(response.email);
+    }
   }
 
   public clearAuthData(): void {

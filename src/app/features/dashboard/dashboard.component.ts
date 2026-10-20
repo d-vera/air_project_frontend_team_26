@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit, OnDestroy, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, OnDestroy, signal, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -93,11 +93,27 @@ import { SensorMapComponent } from '../../shared/components/sensor-map/sensor-ma
               Geographic coordinates and connectivity health across monitoring points
             </p>
           </div>
+          <button
+            type="button"
+            (click)="sensorMap?.resetToDefaultCenter()"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors shadow-xs"
+            title="Focus on Cochabamba, Bolivia"
+          >
+            <svg class="w-3.5 h-3.5 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            <span>Cochabamba</span>
+          </button>
         </div>
 
         <div class="h-[380px] w-full rounded-3xl overflow-hidden shadow-md">
           <app-sensor-map
+            #sensorMap
             [sensors]="sensors()"
+            [center]="cochabambaCenter"
+            [zoom]="cochabambaZoom"
+            [autoFitBounds]="false"
             [showLegend]="true"
             [showSelectButton]="true"
             (sensorSelected)="onMapSensorSelected($event)"
@@ -184,6 +200,15 @@ import { SensorMapComponent } from '../../shared/components/sensor-map/sensor-ma
   `
 })
 export class DashboardComponent implements OnInit, OnDestroy {
+  @ViewChild('sensorMap') sensorMap?: SensorMapComponent;
+
+  readonly cochabambaCenter = { lat: -17.3935, lng: -66.1570 };
+  readonly cochabambaZoom = 12;
+
+  recenterMap(): void {
+    this.sensorMap?.resetToDefaultCenter();
+  }
+
   private userService = inject(UserService);
   private airQualityService = inject(AirQualityService);
   private sensorService = inject(SensorService);

@@ -59,6 +59,8 @@ export class SensorMapComponent implements OnInit, OnChanges, OnDestroy {
   @Input() selectedSensorId: number | null = null;
   @Input() center: { lat: number; lng: number } = { lat: -17.3935, lng: -66.1570 };
   @Input() zoom = 12;
+  @Input() autoFitBounds = false;
+  @Input() focusOnSelect = false;
   @Input() showLegend = true;
   @Input() showSelectButton = false;
   @Input() allowMapClick = false;
@@ -85,6 +87,21 @@ export class SensorMapComponent implements OnInit, OnChanges, OnDestroy {
   ngOnChanges(changes: SimpleChanges): void {
     if (this.map && (changes['sensors'] || changes['selectedSensorId'])) {
       this.updateMarkers();
+    }
+    if (this.map && (changes['center'] || changes['zoom'])) {
+      this.map.setView([this.center.lat, this.center.lng], this.zoom);
+    }
+  }
+
+  public resetToDefaultCenter(): void {
+    if (this.map) {
+      this.map.setView([this.center.lat, this.center.lng], this.zoom);
+    }
+  }
+
+  public setFocus(lat: number, lng: number, zoom?: number): void {
+    if (this.map) {
+      this.map.setView([lat, lng], zoom ?? this.zoom);
     }
   }
 
@@ -221,10 +238,26 @@ export class SensorMapComponent implements OnInit, OnChanges, OnDestroy {
       this.markersLayer.addLayer(marker);
     });
 
-    if (bounds.length === 1) {
-      this.map.setView(bounds[0], 14);
-    } else if (bounds.length > 1) {
-      this.map.fitBounds(L.latLngBounds(bounds), { padding: [40, 40] });
+    if (this.selectedSensorId && this.focusOnSelect) {
+      const selected = this.sensors.find((s) => s.id === this.selectedSensorId);
+      if (
+        selected &&
+        typeof selected.latitude === 'number' &&
+        typeof selected.longitude === 'number' &&
+        !isNaN(selected.latitude) &&
+        !isNaN(selected.longitude)
+      ) {
+        this.map.setView([selected.latitude, selected.longitude], 14);
+        return;
+      }
+    }
+
+    if (this.autoFitBounds) {
+      if (bounds.length === 1) {
+        this.map.setView(bounds[0], 14);
+      } else if (bounds.length > 1) {
+        this.map.fitBounds(L.latLngBounds(bounds), { padding: [40, 40] });
+      }
     }
   }
 

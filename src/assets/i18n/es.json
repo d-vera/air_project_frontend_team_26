@@ -21,8 +21,8 @@
     "REGISTER_SUBTITLE": "Únete a Air Project para gestionar datos y usuarios",
     "EMAIL": "Correo Electrónico",
     "PASSWORD": "Contraseña",
-    "FIRST_NAME": "Nombre",
-    "LAST_NAME": "Apellido",
+    "FIRST_NAME": "Nombre(s)",
+    "LAST_NAME": "Apellido(s)",
     "LOGIN_BTN": "Iniciar Sesión",
     "REGISTER_BTN": "Crear Cuenta",
     "NO_ACCOUNT": "¿No tienes una cuenta?",
@@ -33,7 +33,8 @@
     "EMAIL_EXISTS": "Este correo electrónico ya está registrado",
     "SESSION_EXPIRED": "Tu sesión ha expirado. Por favor, inicia sesión nuevamente.",
     "PASSWORD_MIN_LENGTH": "La contraseña debe tener al menos 8 caracteres",
-    "SHOW_PASSWORD": "Ver contraseña"
+    "SHOW_PASSWORD": "Ver contraseña",
+    "REGISTER_SUCCESS": "Registro exitoso"
   },
   "PROFILE": {
     "TITLE": "Mi Perfil",

@@ -161,5 +161,35 @@ describe('SensorMapComponent', () => {
       component.mapClicked.emit({ lat: -12.0, lng: -77.0 });
       expect(spy).toHaveBeenCalledWith({ lat: -12.0, lng: -77.0 });
     });
+
+    it('should default autoFitBounds to false and zoom to 12', () => {
+      expect(component.autoFitBounds).toBe(false);
+      expect(component.zoom).toBe(12);
+    });
+
+    it('should safely execute resetToDefaultCenter and setFocus when map is not initialized', () => {
+      expect(() => component.resetToDefaultCenter()).not.toThrow();
+      expect(() => component.setFocus(-17.3935, -66.1570, 12)).not.toThrow();
+    });
+
+    it('should call setView on map when resetToDefaultCenter is invoked', () => {
+      const mockMap = {
+        setView: vi.fn(),
+        remove: vi.fn()
+      };
+      (component as any).map = mockMap;
+      component.resetToDefaultCenter();
+      expect(mockMap.setView).toHaveBeenCalledWith([-17.3935, -66.1570], 12);
+    });
+
+    it('should call setView on map when setFocus is invoked', () => {
+      const mockMap = {
+        setView: vi.fn(),
+        remove: vi.fn()
+      };
+      (component as any).map = mockMap;
+      component.setFocus(-17.3935, -66.1570, 14);
+      expect(mockMap.setView).toHaveBeenCalledWith([-17.3935, -66.1570], 14);
+    });
   });
 });

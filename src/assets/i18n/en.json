@@ -21,8 +21,8 @@
     "REGISTER_SUBTITLE": "Join Air Project to manage sensor data & users",
     "EMAIL": "Email Address",
     "PASSWORD": "Password",
-    "FIRST_NAME": "First Name",
-    "LAST_NAME": "Last Name",
+    "FIRST_NAME": "First Name(s)",
+    "LAST_NAME": "Last Name(s)",
     "LOGIN_BTN": "Log In",
     "REGISTER_BTN": "Create Account",
     "NO_ACCOUNT": "Don't have an account?",
@@ -33,7 +33,8 @@
     "EMAIL_EXISTS": "This email address is already registered",
     "SESSION_EXPIRED": "Your session has expired. Please log in again.",
     "PASSWORD_MIN_LENGTH": "Password must be at least 8 characters long",
-    "SHOW_PASSWORD": "Show password"
+    "SHOW_PASSWORD": "Show password",
+    "REGISTER_SUCCESS": "Registration successful"
   },
   "PROFILE": {
     "TITLE": "My Profile",

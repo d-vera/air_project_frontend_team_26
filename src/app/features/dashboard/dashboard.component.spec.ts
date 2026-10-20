@@ -198,5 +198,19 @@ describe('DashboardComponent', () => {
       lastSeen: '2026-10-05T20:10:00Z'
     });
   });
+
+  it('should initialize map center to Cochabamba, Bolivia (-17.3935, -66.1570) and zoom 12', () => {
+    expect(component.cochabambaCenter).toEqual({ lat: -17.3935, lng: -66.1570 });
+    expect(component.cochabambaZoom).toBe(12);
+  });
+
+  it('should call resetToDefaultCenter on sensorMap when recenterMap is executed', () => {
+    component.sensorMap = {
+      resetToDefaultCenter: vi.fn()
+    } as any;
+
+    component.recenterMap();
+    expect(component.sensorMap?.resetToDefaultCenter).toHaveBeenCalled();
+  });
 });
 

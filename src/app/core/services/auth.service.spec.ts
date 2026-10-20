@@ -153,7 +153,7 @@ describe('AuthService', () => {
   });
 
   describe('register', () => {
-    it('should store auth data on successful registration', () => {
+    it('should store auth data on successful registration with token', () => {
       service = createService();
 
       service.register({
@@ -176,6 +176,42 @@ describe('AuthService', () => {
       expect(service.token()).toBe('reg-token');
       expect(service.email()).toBe('new@test.com');
       expect(mockLocalStorage.getItem('auth_token')).toBe('reg-token');
+    });
+
+    it('should safely succeed without storing token if backend does not return token', () => {
+      service = createService();
+
+      let result: any;
+      service.register({
+        email: 'notoken@test.com',
+        password: 'pass',
+        firstName: 'John',
+        lastName: 'Doe',
+      }).subscribe(res => result = res);
+
+      const req = httpTesting.expectOne('/api/auth/register');
+      req.flush({ message: 'User created' });
+
+      expect(service.token()).toBeNull();
+      expect(result.message).toBe('User created');
+    });
+
+    it('should treat 2xx status errors (e.g. text/plain body) as success', () => {
+      service = createService();
+
+      let result: any;
+      service.register({
+        email: 'created@test.com',
+        password: 'pass',
+        firstName: 'John',
+        lastName: 'Doe',
+      }).subscribe(res => result = res);
+
+      const req = httpTesting.expectOne('/api/auth/register');
+      req.flush('User registered successfully', { status: 201, statusText: 'Created' });
+
+      expect(result).toBeDefined();
+      expect(result.email).toBe('created@test.com');
     });
   });
 

@@ -48,10 +48,20 @@ import { LanguageToggleComponent } from '../../../shared/components/language-tog
       <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div class="bg-white dark:bg-slate-900 py-8 px-6 sm:px-10 shadow-xl shadow-slate-200/50 dark:shadow-none rounded-2xl border border-slate-200/80 dark:border-slate-800">
           
+          <!-- Success Alert -->
+          @if (successMessage()) {
+            <div class="mb-4 p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800/60 text-emerald-700 dark:text-emerald-300 text-xs sm:text-sm flex items-center space-x-2">
+              <svg class="w-5 h-5 shrink-0 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>{{ successMessage()! | translate }}</span>
+            </div>
+          }
+
           <!-- Error Alert -->
           @if (errorMessage()) {
             <div class="mb-4 p-3 rounded-xl bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800/60 text-red-700 dark:text-red-300 text-xs sm:text-sm flex items-center space-x-2">
-              <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-5 h-5 shrink-0 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <span>{{ errorMessage()! | translate }}</span>
@@ -151,7 +161,7 @@ import { LanguageToggleComponent } from '../../../shared/components/language-tog
             <!-- Submit Button -->
             <button
               type="submit"
-              [disabled]="regForm.invalid || loading()"
+              [disabled]="regForm.invalid || loading() || !!successMessage()"
               class="w-full py-3.5 px-4 rounded-xl font-bold text-white bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-sky-500/25 transition-all transform active:scale-[0.99] text-sm flex items-center justify-center space-x-2 mt-2"
             >
               @if (loading()) {
@@ -195,27 +205,61 @@ export class RegisterComponent {
   showPassword = signal<boolean>(false);
   loading = signal<boolean>(false);
   errorMessage = signal<string | null>(null);
+  successMessage = signal<string | null>(null);
 
   onSubmit(): void {
+    if (this.loading() || this.successMessage()) return;
     if (!this.email || !this.password || !this.firstName || !this.lastName) return;
 
     this.loading.set(true);
     this.errorMessage.set(null);
+    this.successMessage.set(null);
 
     this.authService.register({
-      email: this.email,
+      email: this.email.trim(),
       password: this.password,
-      firstName: this.firstName,
-      lastName: this.lastName
+      firstName: this.firstName.trim(),
+      lastName: this.lastName.trim()
     }).subscribe({
       next: () => {
         this.loading.set(false);
-        this.router.navigate(['/dashboard']);
+        this.successMessage.set('AUTH.REGISTER_SUCCESS');
+        setTimeout(() => {
+          if (this.authService.isAuthenticated()) {
+            this.router.navigate(['/dashboard']);
+          } else {
+            this.router.navigate(['/login']);
+          }
+        }, 1500);
       },
       error: (err) => {
         this.loading.set(false);
-        if (err.status === 409) {
+        // Handle unexpected 2xx responses parsed as errors
+        if (err?.status >= 200 && err?.status < 300) {
+          this.successMessage.set('AUTH.REGISTER_SUCCESS');
+          setTimeout(() => {
+            if (this.authService.isAuthenticated()) {
+              this.router.navigate(['/dashboard']);
+            } else {
+              this.router.navigate(['/login']);
+            }
+          }, 1500);
+          return;
+        }
+
+        if (err?.status === 409) {
           this.errorMessage.set('AUTH.EMAIL_EXISTS');
+        } else if (typeof err?.error?.message === 'string' && err.error.message.trim().length > 0) {
+          this.errorMessage.set(err.error.message);
+        } else if (typeof err?.error === 'string' && err.error.trim().length > 0) {
+          this.errorMessage.set(err.error);
+        } else if (Array.isArray(err?.error?.errors) && err.error.errors.length > 0) {
+          this.errorMessage.set(err.error.errors.join(', '));
+        } else if (err?.error?.errors && typeof err.error.errors === 'object') {
+          const firstKey = Object.keys(err.error.errors)[0];
+          this.errorMessage.set(err.error.errors[firstKey] || 'COMMON.ERROR');
+        } else if (typeof err?.message === 'string' && !err?.status) {
+          this.errorMessage.set(err.message);
         } else {
           this.errorMessage.set('COMMON.ERROR');
         }
