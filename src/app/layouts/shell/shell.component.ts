@@ -1,13 +1,15 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
+import { ChatbotWidgetComponent } from '../../shared/components/chatbot-widget/chatbot-widget.component';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-shell',
   standalone: true,
-  imports: [CommonModule, RouterModule, SidebarComponent, NavbarComponent],
+  imports: [CommonModule, RouterModule, SidebarComponent, NavbarComponent, ChatbotWidgetComponent],
   template: `
     <div class="flex h-screen overflow-hidden bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
       <!-- Desktop Sidebar (Permanent >= md) -->
@@ -36,11 +38,18 @@ import { NavbarComponent } from '../../shared/components/navbar/navbar.component
           </div>
         </main>
       </div>
+
+      <!-- Floating Chatbot Widget for Authenticated Users -->
+      @if (isAuthenticated()) {
+        <app-chatbot-widget></app-chatbot-widget>
+      }
     </div>
   `
 })
 export class ShellComponent {
+  authService = inject(AuthService);
   mobileSidebarOpen = signal<boolean>(false);
+  isAuthenticated = computed(() => this.authService.isAuthenticated());
 
   toggleSidebar(): void {
     this.mobileSidebarOpen.set(!this.mobileSidebarOpen());
