@@ -157,6 +157,13 @@ export class ReportTrendChartComponent implements AfterViewInit, OnChanges, OnDe
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['report']) {
       this.renderChart();
+      if (typeof requestAnimationFrame !== 'undefined') {
+        requestAnimationFrame(() => {
+          if (this.chart) {
+            this.chart.resize();
+          }
+        });
+      }
     }
   }
 

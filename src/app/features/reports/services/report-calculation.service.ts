@@ -255,9 +255,14 @@ export class ReportCalculationService {
     const worstSeverity = this.calculateWorstSeverity(primaryReadings);
 
     let deltas: Record<ReportParameter, ComparisonDelta> | undefined;
+    let comparisonStoplightDistribution: StoplightDistribution | undefined;
+    let comparisonWorstSeverity: StoplightStatus | undefined;
+
     if (query.comparisonEnabled && comparisonReadings && comparisonReadings.length > 0) {
       const comparisonStats = this.calculateStatistics(comparisonReadings);
       deltas = this.calculateComparisonDeltas(statistics, comparisonStats);
+      comparisonStoplightDistribution = this.calculateStoplightDistribution(comparisonReadings);
+      comparisonWorstSeverity = this.calculateWorstSeverity(comparisonReadings);
     }
 
     const primaryPeriodLabel = this.formatPeriodLabel(query.rangeShortcut, query.from, query.to);
@@ -277,7 +282,9 @@ export class ReportCalculationService {
       statistics,
       deltas,
       stoplightDistribution,
-      worstSeverity
+      worstSeverity,
+      comparisonStoplightDistribution,
+      comparisonWorstSeverity
     };
   }
 

@@ -89,6 +89,8 @@ export interface ReportData {
   deltas?: Record<ReportParameter, ComparisonDelta>;
   stoplightDistribution: StoplightDistribution;
   worstSeverity: StoplightStatus;
+  comparisonStoplightDistribution?: StoplightDistribution;
+  comparisonWorstSeverity?: StoplightStatus;
 }
 
 export type ExportFormat = 'excel' | 'csv' | 'pdf';

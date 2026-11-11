@@ -64,4 +64,45 @@ describe('ReportKpiSummaryComponent', () => {
     const formatted = component.formatTime('2026-09-08T14:30:00Z');
     expect(formatted).toContain('9/8');
   });
+
+  it('should calculate compliant count correctly', () => {
+    const count = component.getCompliantCount({
+      greenCount: 5,
+      yellowCount: 3,
+      orangeCount: 1,
+      redCount: 1,
+      totalCount: 10,
+      complianceRate: 80
+    });
+    expect(count).toBe(8);
+  });
+
+  it('should render secondary badge and calculate delta when comparison is enabled', () => {
+    fixture.componentRef.setInput('report', {
+      ...mockReport,
+      query: {
+        ...mockReport.query,
+        comparisonEnabled: true,
+        comparisonRangeShortcut: '30d'
+      },
+      comparisonPeriodLabel: 'Previous 30 Days',
+      comparisonStoplightDistribution: {
+        greenCount: 6,
+        yellowCount: 2,
+        orangeCount: 2,
+        redCount: 0,
+        totalCount: 10,
+        complianceRate: 80
+      },
+      comparisonWorstSeverity: 'orange'
+    });
+    fixture.detectChanges();
+
+    expect(component.hasComparison).toBe(true);
+    expect(component.complianceDelta).toBe(20); // 100 - 80 = 20
+
+    const text = fixture.nativeElement.textContent;
+    expect(text).toContain('Previous 30 Days');
+    expect(text).toContain('80%');
+  });
 });

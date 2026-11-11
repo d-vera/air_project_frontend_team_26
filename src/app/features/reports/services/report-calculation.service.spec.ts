@@ -194,6 +194,9 @@ describe('ReportCalculationService', () => {
       expect(result.deltas).toBeDefined();
       expect(result.stoplightDistribution.totalCount).toBe(3);
       expect(result.worstSeverity).toBe('red');
+      expect(result.comparisonStoplightDistribution).toBeDefined();
+      expect(result.comparisonStoplightDistribution?.totalCount).toBe(1);
+      expect(result.comparisonWorstSeverity).toBeDefined();
     });
   });
 });

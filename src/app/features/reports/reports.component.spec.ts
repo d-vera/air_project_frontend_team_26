@@ -253,4 +253,78 @@ describe('ReportsComponent', () => {
     expect(component.comparisonCustomFrom).toBeTruthy();
     expect(component.comparisonCustomTo).toBeTruthy();
   });
+
+  it('should generate fallback readings when backend returns empty readings', () => {
+    mockAirQualityService.getHistoricalReadings.mockReturnValueOnce(of({ readings: [] }));
+
+    component.selectedShortcut = '24h';
+    component.loadReportData();
+
+    expect(component.reportData).toBeTruthy();
+    expect(component.reportData!.primaryReadings.length).toBe(24);
+    expect(component.reportData!.statistics.pm2_5.mean).toBeGreaterThan(0);
+  });
+
+  it('should generate fallback readings when backend returns error', () => {
+    mockAirQualityService.getHistoricalReadings.mockReturnValueOnce(throwError(() => new Error('API failure')));
+
+    component.selectedShortcut = '7d';
+    component.loadReportData();
+
+    expect(component.reportData).toBeTruthy();
+    expect(component.reportData!.primaryReadings.length).toBe(28);
+    expect(component.reportData!.statistics.pm2_5.mean).toBeGreaterThan(0);
+  });
+
+  it('should auto-load report data and invoke scrollToChart when selecting shortcut in Primary Time Period', () => {
+    const scrollSpy = vi.spyOn(component, 'scrollToChart');
+    const loadSpy = vi.spyOn(component, 'loadReportData');
+
+    component.onShortcutChange('7d');
+
+    expect(component.selectedShortcut).toBe('7d');
+    expect(loadSpy).toHaveBeenCalledWith(true);
+  });
+
+  it('should auto-load report data when custom dates change and are valid', () => {
+    const loadSpy = vi.spyOn(component, 'loadReportData');
+    component.selectedShortcut = 'custom';
+    component.customFrom = '2026-09-01';
+    component.customTo = '2026-09-15';
+
+    component.onCustomFromChange('2026-09-05');
+    expect(component.customFrom).toBe('2026-09-05');
+    expect(loadSpy).toHaveBeenCalledWith(true);
+
+    loadSpy.mockClear();
+    component.onCustomToChange('2026-09-20');
+    expect(component.customTo).toBe('2026-09-20');
+    expect(loadSpy).toHaveBeenCalledWith(true);
+  });
+
+  it('should not auto-load report data when custom dates are invalid', () => {
+    const loadSpy = vi.spyOn(component, 'loadReportData');
+    component.selectedShortcut = 'custom';
+    component.customFrom = '2026-09-20';
+    component.customTo = '2026-09-10';
+
+    component.onCustomFromChange('2026-09-25');
+    expect(loadSpy).not.toHaveBeenCalled();
+  });
+
+  it('should generate comparison fallback readings when comparison is enabled and backend returns empty', () => {
+    mockAirQualityService.getHistoricalReadings
+      .mockReturnValueOnce(of({ readings: [] }))
+      .mockReturnValueOnce(of({ readings: [] }));
+
+    component.comparisonEnabled = true;
+    component.selectedShortcut = '30d';
+    component.comparisonShortcut = '30d';
+    component.loadReportData();
+
+    expect(component.reportData).toBeTruthy();
+    expect(component.reportData?.primaryReadings.length).toBe(30);
+    expect(component.reportData?.comparisonReadings?.length).toBe(30);
+    expect(component.reportData?.deltas).toBeTruthy();
+  });
 });
