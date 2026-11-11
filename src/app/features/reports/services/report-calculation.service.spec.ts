@@ -198,5 +198,24 @@ describe('ReportCalculationService', () => {
       expect(result.comparisonStoplightDistribution?.totalCount).toBe(1);
       expect(result.comparisonWorstSeverity).toBeDefined();
     });
+
+    it('should omit deltas when primaryReadings is empty even if comparisonReadings exist', () => {
+      const query: ReportQuery = {
+        deviceId: 'SENSOR-001',
+        deviceName: 'Central Patio',
+        rangeShortcut: 'custom',
+        from: '2026-10-10',
+        to: '2026-10-11',
+        comparisonEnabled: true,
+        comparisonRangeShortcut: '30d'
+      };
+
+      const result = service.generateReportData(query, [], [sampleReadings[0]]);
+
+      expect(result.primaryReadings).toEqual([]);
+      expect(result.stoplightDistribution.totalCount).toBe(0);
+      expect(result.deltas).toBeUndefined();
+      expect(result.comparisonStoplightDistribution?.totalCount).toBe(1);
+    });
   });
 });

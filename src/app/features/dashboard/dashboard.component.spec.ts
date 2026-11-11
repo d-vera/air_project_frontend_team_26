@@ -212,5 +212,83 @@ describe('DashboardComponent', () => {
     component.recenterMap();
     expect(component.sensorMap?.resetToDefaultCenter).toHaveBeenCalled();
   });
+
+  it('should set historicalReadings to empty array when custom range returns no data', () => {
+    fixture.detectChanges();
+    mockAirQualityService.getHistoricalReadings.mockReturnValueOnce(of({ readings: [] }));
+
+    component.onCustomRangeChange({ from: '2026-10-10', to: '2026-10-11' });
+
+    expect(component.activeShortcut()).toBe('custom');
+    expect(component.historicalReadings()).toEqual([]);
+  });
+
+  it('should set historicalReadings to empty array when custom range request fails', () => {
+    fixture.detectChanges();
+    mockAirQualityService.getHistoricalReadings.mockReturnValueOnce(throwError(() => new Error('API Error')));
+
+    component.onCustomRangeChange({ from: '2026-10-10', to: '2026-10-11' });
+
+    expect(component.activeShortcut()).toBe('custom');
+    expect(component.historicalReadings()).toEqual([]);
+  });
+
+  it('should preserve all sensors in sensorOptions and deviceList after selecting a single sensor', () => {
+    mockAirQualityService.getCurrentReadings.mockImplementation((deviceId?: string) => {
+      if (deviceId === 'ACEA5AC8E720') {
+        return of({
+          readings: [
+            {
+              deviceId: 'ACEA5AC8E720',
+              deviceName: 'Central Sensor',
+              time: '2026-11-11T12:00:00Z',
+              temperature: 24,
+              humidity: 50,
+              co2: 410,
+              pm1_0: 3,
+              pm2_5: 8,
+              pm10: 12
+            }
+          ]
+        });
+      }
+      return of({ readings: [] });
+    });
+
+    fixture.detectChanges();
+    component.onDeviceChange('ACEA5AC8E720');
+
+    expect(component.selectedDeviceId()).toBe('ACEA5AC8E720');
+    expect(component.deviceList()).toEqual(['ACEA5AC8E720', 'B189DF621C11', 'C993AF718223']);
+    expect(component.sensorOptions()).toEqual([
+      { id: 'ACEA5AC8E720', label: 'Central Sensor (ACEA5AC8E720)' },
+      { id: 'B189DF621C11', label: 'North Sensor (B189DF621C11)' },
+      { id: 'C993AF718223', label: 'South Sensor (C993AF718223)' }
+    ]);
+  });
+
+  it('should set currentReadings to empty array instead of hardcoded fallback when selected sensor has no readings', () => {
+    fixture.detectChanges();
+    mockAirQualityService.getCurrentReadings.mockReturnValueOnce(of({ readings: [] }));
+    mockAirQualityService.getHistoricalReadings.mockReturnValueOnce(of({ readings: [] }));
+
+    component.onDeviceChange('B189DF621C11');
+
+    expect(component.currentReadings()).toEqual([]);
+    expect(component.deviceList()).toEqual(['ACEA5AC8E720', 'B189DF621C11', 'C993AF718223']);
+    expect(mockAirQualityService.getHistoricalReadings).toHaveBeenCalledWith({
+      deviceId: 'B189DF621C11',
+      rangeShortcut: '24h'
+    });
+  });
+
+  it('should set currentReadings to empty array when selected sensor current request fails', () => {
+    fixture.detectChanges();
+    mockAirQualityService.getCurrentReadings.mockReturnValueOnce(throwError(() => new Error('Network error')));
+
+    component.onDeviceChange('C993AF718223');
+
+    expect(component.currentReadings()).toEqual([]);
+  });
 });
 

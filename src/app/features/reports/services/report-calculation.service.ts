@@ -259,8 +259,10 @@ export class ReportCalculationService {
     let comparisonWorstSeverity: StoplightStatus | undefined;
 
     if (query.comparisonEnabled && comparisonReadings && comparisonReadings.length > 0) {
-      const comparisonStats = this.calculateStatistics(comparisonReadings);
-      deltas = this.calculateComparisonDeltas(statistics, comparisonStats);
+      if (primaryReadings && primaryReadings.length > 0) {
+        const comparisonStats = this.calculateStatistics(comparisonReadings);
+        deltas = this.calculateComparisonDeltas(statistics, comparisonStats);
+      }
       comparisonStoplightDistribution = this.calculateStoplightDistribution(comparisonReadings);
       comparisonWorstSeverity = this.calculateWorstSeverity(comparisonReadings);
     }

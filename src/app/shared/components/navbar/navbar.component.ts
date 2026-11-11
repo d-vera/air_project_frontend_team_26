@@ -54,7 +54,7 @@ import { AuthService } from '../../../core/services/auth.service';
               routerLink="/login"
               class="px-3.5 py-1.5 rounded-xl text-xs font-semibold text-white bg-sky-500 hover:bg-sky-600 transition-colors shadow-xs"
             >
-              {{ 'AUTH.LOGIN_BUTTON' | translate }}
+              {{ 'NAV.LOGIN' | translate }}
             </a>
           </div>
         }

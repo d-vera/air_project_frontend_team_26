@@ -254,26 +254,30 @@ describe('ReportsComponent', () => {
     expect(component.comparisonCustomTo).toBeTruthy();
   });
 
-  it('should generate fallback readings when backend returns empty readings', () => {
+  it('should preserve empty readings without generating synthetic fallback data when backend returns empty readings', () => {
     mockAirQualityService.getHistoricalReadings.mockReturnValueOnce(of({ readings: [] }));
 
-    component.selectedShortcut = '24h';
+    component.selectedShortcut = 'custom';
+    component.customFrom = '2026-10-10';
+    component.customTo = '2026-10-11';
     component.loadReportData();
 
     expect(component.reportData).toBeTruthy();
-    expect(component.reportData!.primaryReadings.length).toBe(24);
-    expect(component.reportData!.statistics.pm2_5.mean).toBeGreaterThan(0);
+    expect(component.reportData!.primaryReadings).toEqual([]);
+    expect(component.reportData!.stoplightDistribution.totalCount).toBe(0);
+    expect(component.reportData!.statistics.pm2_5.readingsCount).toBe(0);
+    expect(component.errorMsg).toBeNull();
   });
 
-  it('should generate fallback readings when backend returns error', () => {
+  it('should display an error message and clear reportData when backend returns an error', () => {
     mockAirQualityService.getHistoricalReadings.mockReturnValueOnce(throwError(() => new Error('API failure')));
 
     component.selectedShortcut = '7d';
     component.loadReportData();
 
-    expect(component.reportData).toBeTruthy();
-    expect(component.reportData!.primaryReadings.length).toBe(28);
-    expect(component.reportData!.statistics.pm2_5.mean).toBeGreaterThan(0);
+    expect(component.loading).toBe(false);
+    expect(component.reportData).toBeNull();
+    expect(component.errorMsg).toBe('Error querying environmental telemetry records.');
   });
 
   it('should auto-load report data and invoke scrollToChart when selecting shortcut in Primary Time Period', () => {
@@ -312,7 +316,7 @@ describe('ReportsComponent', () => {
     expect(loadSpy).not.toHaveBeenCalled();
   });
 
-  it('should generate comparison fallback readings when comparison is enabled and backend returns empty', () => {
+  it('should preserve empty primary and comparison readings without fallback when comparison is enabled and backend returns empty', () => {
     mockAirQualityService.getHistoricalReadings
       .mockReturnValueOnce(of({ readings: [] }))
       .mockReturnValueOnce(of({ readings: [] }));
@@ -323,8 +327,8 @@ describe('ReportsComponent', () => {
     component.loadReportData();
 
     expect(component.reportData).toBeTruthy();
-    expect(component.reportData?.primaryReadings.length).toBe(30);
-    expect(component.reportData?.comparisonReadings?.length).toBe(30);
-    expect(component.reportData?.deltas).toBeTruthy();
+    expect(component.reportData?.primaryReadings).toEqual([]);
+    expect(component.reportData?.comparisonReadings).toEqual([]);
+    expect(component.reportData?.deltas).toBeUndefined();
   });
 });

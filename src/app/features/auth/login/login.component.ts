@@ -132,8 +132,8 @@ import { LanguageToggleComponent } from '../../../shared/components/language-tog
             </button>
           </form>
 
-          <!-- Register Link -->
-          <div class="mt-6 text-center border-t border-slate-200 dark:border-slate-800 pt-5">
+          <!-- Register Link & Continue as Visitor -->
+          <div class="mt-6 text-center border-t border-slate-200 dark:border-slate-800 pt-5 space-y-4">
             <p class="text-xs text-slate-500 dark:text-slate-400">
               {{ 'AUTH.NO_ACCOUNT' | translate }}
               <a
@@ -143,6 +143,17 @@ import { LanguageToggleComponent } from '../../../shared/components/language-tog
                 {{ 'AUTH.REGISTER_LINK' | translate }}
               </a>
             </p>
+
+            <a
+              routerLink="/dashboard"
+              class="w-full py-2.5 px-4 rounded-xl font-semibold text-xs sm:text-sm text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition-colors flex items-center justify-center space-x-2"
+            >
+              <svg class="w-4 h-4 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+              <span>{{ 'AUTH.CONTINUE_AS_VISITOR' | translate }}</span>
+            </a>
           </div>
 
         </div>

@@ -105,4 +105,61 @@ describe('ReportKpiSummaryComponent', () => {
     expect(text).toContain('Previous 30 Days');
     expect(text).toContain('80%');
   });
+
+  it('should render empty state notice without metric cards when primary has no readings', () => {
+    fixture.componentRef.setInput('report', {
+      ...mockReport,
+      stoplightDistribution: {
+        greenCount: 0,
+        yellowCount: 0,
+        orangeCount: 0,
+        redCount: 0,
+        totalCount: 0,
+        complianceRate: 100
+      }
+    });
+    fixture.detectChanges();
+
+    expect(component.isPrimaryEmpty).toBe(true);
+    const text = fixture.nativeElement.textContent;
+    expect(text).toContain('REPORTS.NO_DATA');
+    expect(text).not.toContain('REPORTS.COMPLIANCE_RATE');
+  });
+
+  it('should hide comparison callout and metric cards when comparison is enabled but primary is empty', () => {
+    fixture.componentRef.setInput('report', {
+      ...mockReport,
+      query: {
+        ...mockReport.query,
+        comparisonEnabled: true,
+        comparisonRangeShortcut: '30d'
+      },
+      comparisonPeriodLabel: 'Previous 30 Days',
+      stoplightDistribution: {
+        greenCount: 0,
+        yellowCount: 0,
+        orangeCount: 0,
+        redCount: 0,
+        totalCount: 0,
+        complianceRate: 100
+      },
+      comparisonStoplightDistribution: {
+        greenCount: 6,
+        yellowCount: 2,
+        orangeCount: 2,
+        redCount: 0,
+        totalCount: 10,
+        complianceRate: 80
+      },
+      comparisonWorstSeverity: 'orange'
+    });
+    fixture.detectChanges();
+
+    expect(component.hasComparison).toBe(true);
+    expect(component.isPrimaryEmpty).toBe(true);
+    const text = fixture.nativeElement.textContent;
+    expect(text).toContain('REPORTS.NO_DATA');
+    expect(text).toContain('Previous 30 Days');
+    expect(text).not.toContain('REPORTS.VS_BASELINE');
+  });
 });

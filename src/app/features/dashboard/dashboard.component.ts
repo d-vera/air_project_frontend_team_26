@@ -12,7 +12,8 @@ import { User } from '../../models/user.model';
 import {
   AirQualityReading,
   TimeRangeShortcut,
-  CustomDateRange
+  CustomDateRange,
+  SensorOption
 } from '../../models/air-quality.model';
 import { AirQualityReadingNotification, SensorStatusNotification } from '../../models/websocket.model';
 import { Sensor } from '../../models/sensor.model';
@@ -68,6 +69,7 @@ import { SensorMapComponent } from '../../shared/components/sensor-map/sensor-ma
       <app-real-time-cards
         [readings]="currentReadings()"
         [deviceList]="deviceList()"
+        [sensorOptions]="sensorOptions()"
         [selectedDeviceId]="selectedDeviceId()"
         (selectedDeviceIdChange)="onDeviceChange($event)"
       ></app-real-time-cards>
@@ -222,10 +224,29 @@ export class DashboardComponent implements OnInit, OnDestroy {
   sensors = signal<Sensor[]>([]);
   currentReadings = signal<AirQualityReading[]>([]);
   historicalReadings = signal<AirQualityReading[]>([]);
-  deviceList = signal<string[]>([]);
+  extraDeviceIds = signal<string[]>([]);
   selectedDeviceId = signal<string>('');
   activeShortcut = signal<TimeRangeShortcut>('24h');
   showAuthModal = signal<boolean>(false);
+
+  /** Full list of selectable sensor options combining registered sensors and discovered readings */
+  sensorOptions = computed<SensorOption[]>(() => {
+    const optionMap = new Map<string, string>();
+    for (const sensor of this.sensors()) {
+      if (sensor.uidSensor) {
+        const label = sensor.name ? `${sensor.name} (${sensor.uidSensor})` : sensor.uidSensor;
+        optionMap.set(sensor.uidSensor, label);
+      }
+    }
+    for (const deviceId of this.extraDeviceIds()) {
+      if (deviceId && !optionMap.has(deviceId)) {
+        optionMap.set(deviceId, deviceId);
+      }
+    }
+    return Array.from(optionMap.entries()).map(([id, label]) => ({ id, label }));
+  });
+
+  deviceList = computed<string[]>(() => this.sensorOptions().map(option => option.id));
 
   /** The single reading used by the stoplight indicator */
   selectedReading = computed<AirQualityReading | null>(() => {
@@ -314,9 +335,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
     this.currentReadings.set(updated);
 
-    // Update deviceList if new device arrived
-    const devices = Array.from(new Set(updated.map(r => r.deviceId)));
-    this.deviceList.set(devices);
+    // Update extraDeviceIds if new device arrived via WebSocket
+    this.mergeExtraDeviceIds([reading.deviceId]);
 
     // If reading is for the currently selected device, update/append to historical chart
     if (!this.selectedDeviceId() || this.selectedDeviceId() === reading.deviceId) {
@@ -397,19 +417,36 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
   }
 
+  private mergeExtraDeviceIds(ids: string[]): void {
+    const current = this.extraDeviceIds();
+    const merged = Array.from(new Set([...current, ...ids.filter(Boolean)]));
+    if (merged.length !== current.length) {
+      this.extraDeviceIds.set(merged);
+    }
+  }
+
   loadCurrentData(): void {
-    this.airQualityService.getCurrentReadings(this.selectedDeviceId()).subscribe({
+    const deviceId = this.selectedDeviceId();
+    this.airQualityService.getCurrentReadings(deviceId).subscribe({
       next: (res) => {
         if (res && res.readings && res.readings.length > 0) {
           this.currentReadings.set(res.readings);
-          const devices = Array.from(new Set(res.readings.map(r => r.deviceId)));
-          this.deviceList.set(devices);
+          if (!deviceId) {
+            const devices = Array.from(new Set(res.readings.map(r => r.deviceId)));
+            this.mergeExtraDeviceIds(devices);
+          }
+        } else if (deviceId) {
+          this.currentReadings.set([]);
         } else {
           this.setFallbackCurrentData();
         }
       },
       error: () => {
-        this.setFallbackCurrentData();
+        if (deviceId) {
+          this.currentReadings.set([]);
+        } else {
+          this.setFallbackCurrentData();
+        }
       }
     });
   }
@@ -420,14 +457,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
       rangeShortcut: this.activeShortcut()
     }).subscribe({
       next: (res) => {
-        if (res && res.readings && res.readings.length > 0) {
-          this.historicalReadings.set(res.readings);
-        } else {
-          this.setFallbackHistoricalData();
-        }
+        this.historicalReadings.set(res?.readings || []);
       },
       error: () => {
-        this.setFallbackHistoricalData();
+        this.historicalReadings.set([]);
       }
     });
   }
@@ -451,14 +484,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
       to: range.to
     }).subscribe({
       next: (res) => {
-        if (res && res.readings && res.readings.length > 0) {
-          this.historicalReadings.set(res.readings);
-        } else {
-          this.setFallbackHistoricalData();
-        }
+        this.historicalReadings.set(res?.readings || []);
       },
       error: () => {
-        this.setFallbackHistoricalData();
+        this.historicalReadings.set([]);
       }
     });
   }
@@ -478,48 +507,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
       }
     ];
     this.currentReadings.set(fallback);
-    this.deviceList.set(['ESP32_001', 'ESP32_002']);
-  }
-
-  private setFallbackHistoricalData(): void {
-    const now = Date.now();
-    const fallback: AirQualityReading[] = [];
-    const shortcut = this.activeShortcut();
-
-    let intervalMs = 60 * 60 * 1000; // 1 hour (24h)
-    let count = 24;
-
-    if (shortcut === '24h') {
-      intervalMs = 60 * 60 * 1000; // 1h intervals for 24h
-      count = 24;
-    } else if (shortcut === '7d') {
-      intervalMs = 6 * 3600 * 1000; // 6h intervals across 7d
-      count = 28;
-    } else if (shortcut === '30d') {
-      intervalMs = 24 * 3600 * 1000; // 1 day intervals across 30d
-      count = 30;
-    } else if (shortcut === '1y') {
-      intervalMs = 14 * 24 * 3600 * 1000; // 2 week intervals across 1 year
-      count = 26;
-    } else if (shortcut === 'custom') {
-      intervalMs = 24 * 3600 * 1000;
-      count = 15;
+    if (this.sensors().length === 0) {
+      this.mergeExtraDeviceIds(['ESP32_001', 'ESP32_002']);
     }
-
-    for (let i = count - 1; i >= 0; i--) {
-      const timeMs = now - i * intervalMs;
-      fallback.push({
-        deviceId: this.selectedDeviceId() || 'ESP32_001',
-        deviceName: 'Nodo Principal',
-        time: new Date(timeMs).toISOString(),
-        temperature: parseFloat((22 + Math.sin(i * 0.5) * 4).toFixed(1)),
-        humidity: parseFloat((55 + Math.cos(i * 0.5) * 10).toFixed(1)),
-        co2: parseFloat((400 + Math.sin(i * 0.4) * 45).toFixed(1)),
-        pm1_0: parseFloat((6 + Math.cos(i * 0.5) * 2.5).toFixed(1)),
-        pm2_5: parseFloat((12 + Math.sin(i * 0.6) * 5).toFixed(1)),
-        pm10: parseFloat((18 + Math.cos(i * 0.4) * 7).toFixed(1))
-      });
-    }
-    this.historicalReadings.set(fallback);
   }
 }

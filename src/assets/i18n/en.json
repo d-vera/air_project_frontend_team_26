@@ -12,7 +12,9 @@
     "REPORTS": "Reports",
     "LOGOUT": "Log Out",
     "LOGIN": "Log In",
-    "REGISTER": "Register"
+    "REGISTER": "Register",
+    "VISITOR": "Visitor",
+    "VISITOR_ACCESS": "Public Access (30d)"
   },
   "AUTH": {
     "LOGIN_TITLE": "Welcome Back",
@@ -34,7 +36,8 @@
     "SESSION_EXPIRED": "Your session has expired. Please log in again.",
     "PASSWORD_MIN_LENGTH": "Password must be at least 8 characters long",
     "SHOW_PASSWORD": "Show password",
-    "REGISTER_SUCCESS": "Registration successful"
+    "REGISTER_SUCCESS": "Registration successful",
+    "CONTINUE_AS_VISITOR": "Continue as Visitor"
   },
   "PROFILE": {
     "TITLE": "My Profile",

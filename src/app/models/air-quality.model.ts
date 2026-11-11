@@ -31,3 +31,8 @@ export interface HistoricalAirQualityQuery {
 export interface HistoricalAirQualityResponse {
   readings: AirQualityReading[];
 }
+
+export interface SensorOption {
+  id: string;
+  label: string;
+}

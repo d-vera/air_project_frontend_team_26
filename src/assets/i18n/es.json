@@ -12,7 +12,9 @@
     "REPORTS": "Reportes",
     "LOGOUT": "Cerrar Sesión",
     "LOGIN": "Iniciar Sesión",
-    "REGISTER": "Registrarse"
+    "REGISTER": "Registrarse",
+    "VISITOR": "Visitante",
+    "VISITOR_ACCESS": "Acceso Público (30d)"
   },
   "AUTH": {
     "LOGIN_TITLE": "Bienvenido de Nuevo",
@@ -34,7 +36,8 @@
     "SESSION_EXPIRED": "Tu sesión ha expirado. Por favor, inicia sesión nuevamente.",
     "PASSWORD_MIN_LENGTH": "La contraseña debe tener al menos 8 caracteres",
     "SHOW_PASSWORD": "Ver contraseña",
-    "REGISTER_SUCCESS": "Registro exitoso"
+    "REGISTER_SUCCESS": "Registro exitoso",
+    "CONTINUE_AS_VISITOR": "Continuar como visitante"
   },
   "PROFILE": {
     "TITLE": "Mi Perfil",

@@ -2,7 +2,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
-import { AirQualityReading } from '../../../../models/air-quality.model';
+import { AirQualityReading, SensorOption } from '../../../../models/air-quality.model';
 
 @Component({
   selector: 'app-real-time-cards',
@@ -37,9 +37,9 @@ import { AirQualityReading } from '../../../../models/air-quality.model';
             class="bg-transparent text-xs font-bold text-slate-800 dark:text-slate-200 pr-3 py-1 focus:outline-hidden cursor-pointer"
           >
             <option value="" class="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">{{ 'DASHBOARD.ALL_DEVICES' | translate }}</option>
-            @for (device of deviceList; track device) {
-              <option [value]="device" class="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">
-                {{ device }}
+            @for (option of options; track option.id) {
+              <option [value]="option.id" class="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">
+                {{ option.label }}
               </option>
             }
           </select>
@@ -149,8 +149,16 @@ import { AirQualityReading } from '../../../../models/air-quality.model';
 export class RealTimeCardsComponent {
   @Input() readings: AirQualityReading[] = [];
   @Input() deviceList: string[] = [];
+  @Input() sensorOptions: SensorOption[] = [];
   @Input() selectedDeviceId: string = '';
   @Output() selectedDeviceIdChange = new EventEmitter<string>();
+
+  get options(): SensorOption[] {
+    if (this.sensorOptions.length > 0) {
+      return this.sensorOptions;
+    }
+    return this.deviceList.map(id => ({ id, label: id }));
+  }
 
   get filteredReadings(): AirQualityReading[] {
     if (!this.selectedDeviceId) {

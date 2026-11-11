@@ -38,7 +38,9 @@ import { LanguageToggleComponent } from '../language-toggle/language-toggle.comp
             />
           </div>
           <h1 class="font-extrabold text-slate-900 dark:text-slate-100 text-lg leading-snug tracking-tight">Project Aeolus</h1>
-          <p class="text-[11px] text-sky-600 dark:text-sky-400 font-semibold tracking-wider uppercase mt-0.5">{{ 'APP.USER_MANAGEMENT' | translate }}</p>
+          @if (authService.isAuthenticated()) {
+            <p class="text-[11px] text-sky-600 dark:text-sky-400 font-semibold tracking-wider uppercase mt-0.5">{{ 'APP.USER_MANAGEMENT' | translate }}</p>
+          }
         </div>
       </div>
 
@@ -48,18 +50,27 @@ import { LanguageToggleComponent } from '../language-toggle/language-toggle.comp
           {{ userInitial }}
         </div>
         <div class="overflow-hidden">
-          <p class="text-xs font-semibold text-slate-900 dark:text-slate-100 truncate">
-            {{ authService.getUserEmail() || 'User' }}
-          </p>
-          <span
-            class="inline-block mt-0.5 px-2 py-0.5 text-[10px] font-bold rounded-md"
-            [ngClass]="{
-              'bg-violet-100 dark:bg-violet-950 text-violet-700 dark:text-violet-300 border border-violet-200 dark:border-violet-800': authService.isAdmin(),
-              'bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800': !authService.isAdmin()
-            }"
-          >
-            {{ (authService.isAdmin() ? 'ADMIN.ROLE_ADMIN' : 'ADMIN.ROLE_REGISTERED_USER') | translate }}
-          </span>
+          @if (authService.isAuthenticated()) {
+            <p class="text-xs font-semibold text-slate-900 dark:text-slate-100 truncate">
+              {{ authService.getUserEmail() || 'User' }}
+            </p>
+            <span
+              class="inline-block mt-0.5 px-2 py-0.5 text-[10px] font-bold rounded-md"
+              [ngClass]="{
+                'bg-violet-100 dark:bg-violet-950 text-violet-700 dark:text-violet-300 border border-violet-200 dark:border-violet-800': authService.isAdmin(),
+                'bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800': !authService.isAdmin()
+              }"
+            >
+              {{ (authService.isAdmin() ? 'ADMIN.ROLE_ADMIN' : 'ADMIN.ROLE_REGISTERED_USER') | translate }}
+            </span>
+          } @else {
+            <p class="text-xs font-semibold text-slate-900 dark:text-slate-100 truncate">
+              {{ 'NAV.VISITOR' | translate }}
+            </p>
+            <span class="inline-block mt-0.5 px-2 py-0.5 text-[10px] font-bold rounded-md bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+              {{ 'NAV.VISITOR_ACCESS' | translate }}
+            </span>
+          }
         </div>
       </div>
 
@@ -79,45 +90,47 @@ import { LanguageToggleComponent } from '../language-toggle/language-toggle.comp
           <span>{{ 'NAV.DASHBOARD' | translate }}</span>
         </a>
 
-        <!-- My Profile -->
-        <a
-          routerLink="/dashboard/profile"
-          routerLinkActive="bg-sky-500 text-white shadow-md shadow-sky-500/20 font-semibold"
-          (click)="closeSidebar.emit()"
-          class="flex items-center space-x-3 px-3 py-2.5 rounded-xl font-medium text-sm transition-all text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white group"
-        >
-          <svg class="w-5 h-5 text-slate-500 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-          </svg>
-          <span>{{ 'NAV.PROFILE' | translate }}</span>
-        </a>
+        @if (authService.isAuthenticated()) {
+          <!-- My Profile -->
+          <a
+            routerLink="/dashboard/profile"
+            routerLinkActive="bg-sky-500 text-white shadow-md shadow-sky-500/20 font-semibold"
+            (click)="closeSidebar.emit()"
+            class="flex items-center space-x-3 px-3 py-2.5 rounded-xl font-medium text-sm transition-all text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white group"
+          >
+            <svg class="w-5 h-5 text-slate-500 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+            <span>{{ 'NAV.PROFILE' | translate }}</span>
+          </a>
 
-        <!-- Preferences -->
-        <a
-          routerLink="/dashboard/preferences"
-          routerLinkActive="bg-sky-500 text-white shadow-md shadow-sky-500/20 font-semibold"
-          (click)="closeSidebar.emit()"
-          class="flex items-center space-x-3 px-3 py-2.5 rounded-xl font-medium text-sm transition-all text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white group"
-        >
-          <svg class="w-5 h-5 text-slate-500 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
-          <span>{{ 'NAV.PREFERENCES' | translate }}</span>
-        </a>
+          <!-- Preferences -->
+          <a
+            routerLink="/dashboard/preferences"
+            routerLinkActive="bg-sky-500 text-white shadow-md shadow-sky-500/20 font-semibold"
+            (click)="closeSidebar.emit()"
+            class="flex items-center space-x-3 px-3 py-2.5 rounded-xl font-medium text-sm transition-all text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white group"
+          >
+            <svg class="w-5 h-5 text-slate-500 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            <span>{{ 'NAV.PREFERENCES' | translate }}</span>
+          </a>
 
-        <!-- Environmental Reports -->
-        <a
-          routerLink="/dashboard/reports"
-          routerLinkActive="bg-sky-500 text-white shadow-md shadow-sky-500/20 font-semibold"
-          (click)="closeSidebar.emit()"
-          class="flex items-center space-x-3 px-3 py-2.5 rounded-xl font-medium text-sm transition-all text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white group"
-        >
-          <svg class="w-5 h-5 text-slate-500 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-          </svg>
-          <span>{{ 'NAV.REPORTS' | translate }}</span>
-        </a>
+          <!-- Environmental Reports -->
+          <a
+            routerLink="/dashboard/reports"
+            routerLinkActive="bg-sky-500 text-white shadow-md shadow-sky-500/20 font-semibold"
+            (click)="closeSidebar.emit()"
+            class="flex items-center space-x-3 px-3 py-2.5 rounded-xl font-medium text-sm transition-all text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white group"
+          >
+            <svg class="w-5 h-5 text-slate-500 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+            <span>{{ 'NAV.REPORTS' | translate }}</span>
+          </a>
+        }
 
         <!-- Admin Only: User Management -->
         @if (authService.isAdmin()) {
@@ -162,16 +175,29 @@ import { LanguageToggleComponent } from '../language-toggle/language-toggle.comp
           <app-language-toggle></app-language-toggle>
         </div>
 
-        <button
-          (click)="onLogout()"
-          type="button"
-          class="w-full flex items-center justify-center space-x-2 px-3 py-2.5 rounded-xl font-medium text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors"
-        >
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-          </svg>
-          <span>{{ 'NAV.LOGOUT' | translate }}</span>
-        </button>
+        @if (authService.isAuthenticated()) {
+          <button
+            (click)="onLogout()"
+            type="button"
+            class="w-full flex items-center justify-center space-x-2 px-3 py-2.5 rounded-xl font-medium text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors cursor-pointer"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+            <span>{{ 'NAV.LOGOUT' | translate }}</span>
+          </button>
+        } @else {
+          <a
+            routerLink="/login"
+            (click)="closeSidebar.emit()"
+            class="w-full flex items-center justify-center space-x-2 px-3 py-2.5 rounded-xl font-semibold text-sm text-white bg-sky-500 hover:bg-sky-600 transition-colors shadow-sm"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+            </svg>
+            <span>{{ 'NAV.LOGIN' | translate }}</span>
+          </a>
+        }
       </div>
     </aside>
   `
@@ -183,6 +209,9 @@ export class SidebarComponent {
   @Output() closeSidebar = new EventEmitter<void>();
 
   get userInitial(): string {
+    if (!this.authService.isAuthenticated()) {
+      return 'V';
+    }
     const email = this.authService.getUserEmail();
     return email ? email.charAt(0).toUpperCase() : 'U';
   }

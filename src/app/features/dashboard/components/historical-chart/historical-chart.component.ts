@@ -213,9 +213,19 @@ Chart.register(
       </div>
 
       <!-- Chart Canvas Wrapper -->
-      <div class="relative w-full h-72 sm:h-80">
+      <div class="relative w-full h-72 sm:h-80" [class.hidden]="!readings || readings.length === 0">
         <canvas #chartCanvas></canvas>
       </div>
+
+      <!-- Empty State -->
+      @if (!readings || readings.length === 0) {
+        <div class="flex flex-col items-center justify-center h-72 sm:h-80 text-slate-400 dark:text-slate-500 bg-slate-50/50 dark:bg-slate-800/30 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800">
+          <svg class="w-10 h-10 mb-2 text-slate-300 dark:text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
+          <p class="text-sm font-medium text-slate-600 dark:text-slate-400">{{ 'REPORTS.CHART_NO_DATA' | translate }}</p>
+        </div>
+      }
     </div>
   `
 })
@@ -311,6 +321,11 @@ export class HistoricalChartComponent implements AfterViewInit, OnChanges, OnDes
 
     if (this.chart) {
       this.chart.destroy();
+      this.chart = null;
+    }
+
+    if (!this.readings || this.readings.length === 0) {
+      return;
     }
 
     const ctx = this.chartCanvas.nativeElement.getContext('2d');

@@ -2,7 +2,6 @@ import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslatePipe } from '@ngx-translate/core';
 import { forkJoin, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
 
 import { SensorService } from '../../core/services/sensor.service';
 import { AirQualityService } from '../../core/services/air-quality.service';
@@ -348,21 +347,16 @@ export class ReportsComponent implements OnInit {
       rangeShortcut: query.rangeShortcut,
       from: query.from,
       to: query.to
-    }).pipe(
-      catchError(() => of({ readings: [] as AirQualityReading[] }))
-    );
+    });
 
-    let comparisonReq = of({ readings: [] as AirQualityReading[] });
-    if (this.comparisonEnabled) {
-      comparisonReq = this.airQualityService.getHistoricalReadings({
-        deviceId: query.deviceId,
-        rangeShortcut: query.comparisonRangeShortcut,
-        from: query.comparisonFrom,
-        to: query.comparisonTo
-      }).pipe(
-        catchError(() => of({ readings: [] as AirQualityReading[] }))
-      );
-    }
+    const comparisonReq = this.comparisonEnabled
+      ? this.airQualityService.getHistoricalReadings({
+          deviceId: query.deviceId,
+          rangeShortcut: query.comparisonRangeShortcut,
+          from: query.comparisonFrom,
+          to: query.comparisonTo
+        })
+      : of({ readings: [] as AirQualityReading[] });
 
     forkJoin({
       primary: primaryReq,
@@ -370,14 +364,9 @@ export class ReportsComponent implements OnInit {
     }).subscribe({
       next: ({ primary, comparison }) => {
         this.loading = false;
-        const primaryReadings = (primary.readings && primary.readings.length > 0)
-          ? primary.readings
-          : this.generateFallbackReadings(query.deviceId, query.rangeShortcut, query.from, query.to, false);
-
+        const primaryReadings = primary?.readings || [];
         const comparisonReadings = this.comparisonEnabled
-          ? ((comparison.readings && comparison.readings.length > 0)
-              ? comparison.readings
-              : this.generateFallbackReadings(query.deviceId, query.comparisonRangeShortcut || '30d', query.comparisonFrom, query.comparisonTo, true))
+          ? (comparison?.readings || [])
           : undefined;
 
         this.reportData = this.calculationService.generateReportData(
@@ -392,91 +381,11 @@ export class ReportsComponent implements OnInit {
       },
       error: () => {
         this.loading = false;
-        const primaryReadings = this.generateFallbackReadings(query.deviceId, query.rangeShortcut, query.from, query.to, false);
-        const comparisonReadings = this.comparisonEnabled
-          ? this.generateFallbackReadings(query.deviceId, query.comparisonRangeShortcut || '30d', query.comparisonFrom, query.comparisonTo, true)
-          : undefined;
-
-        this.reportData = this.calculationService.generateReportData(
-          query,
-          primaryReadings,
-          comparisonReadings
-        );
+        this.reportData = null;
+        this.errorMsg = 'Error querying environmental telemetry records.';
         this.cdr.markForCheck();
-        if (shouldScroll) {
-          this.scrollToChart();
-        }
       }
     });
-  }
-
-  private generateFallbackReadings(
-    deviceId: string,
-    shortcut?: TimeRangeShortcut,
-    from?: string,
-    to?: string,
-    isComparison = false
-  ): AirQualityReading[] {
-    const now = Date.now();
-    const fallback: AirQualityReading[] = [];
-
-    let count = 24;
-    let intervalMs = 60 * 60 * 1000;
-    let endTime = now;
-
-    if (shortcut === '24h') {
-      intervalMs = 60 * 60 * 1000;
-      count = 24;
-      endTime = now;
-    } else if (shortcut === '7d') {
-      intervalMs = 6 * 3600 * 1000;
-      count = 28;
-      endTime = now;
-    } else if (shortcut === '30d') {
-      intervalMs = 24 * 3600 * 1000;
-      count = 30;
-      endTime = now;
-    } else if (shortcut === '1y') {
-      intervalMs = 14 * 24 * 3600 * 1000;
-      count = 26;
-      endTime = now;
-    } else if (shortcut === 'custom') {
-      if (from && to) {
-        const startMs = new Date(from).getTime();
-        const endMs = new Date(to).getTime();
-        const diffMs = Math.max(endMs - startMs, 86400000);
-        count = Math.min(Math.max(Math.round(diffMs / 86400000), 7), 30);
-        intervalMs = Math.floor(diffMs / count);
-        endTime = endMs;
-      } else {
-        intervalMs = 24 * 3600 * 1000;
-        count = 15;
-        endTime = now;
-      }
-    }
-
-    const sensor = this.sensors.find(s => s.uidSensor === deviceId);
-    const stationName = sensor ? sensor.name : (deviceId || 'Patio Central');
-    const deltaOffset = isComparison ? 1.15 : 1.0;
-    const phaseShift = isComparison ? 1.5 : 0;
-
-    for (let i = count - 1; i >= 0; i--) {
-      const timeMs = endTime - i * intervalMs;
-      const phase = (i * 0.5) + phaseShift;
-      fallback.push({
-        deviceId: deviceId || 'ace1',
-        deviceName: stationName,
-        time: new Date(timeMs).toISOString(),
-        temperature: parseFloat((21 + Math.sin(phase) * 3.5).toFixed(1)),
-        humidity: parseFloat((52 + Math.cos(phase) * 8).toFixed(1)),
-        co2: parseFloat((410 * deltaOffset + Math.sin(phase * 0.8) * 35).toFixed(1)),
-        pm1_0: parseFloat((7.5 * deltaOffset + Math.cos(phase) * 2).toFixed(1)),
-        pm2_5: parseFloat((13.5 * deltaOffset + Math.sin(phase * 1.1) * 4).toFixed(1)),
-        pm10: parseFloat((22 * deltaOffset + Math.cos(phase * 0.9) * 5.5).toFixed(1))
-      });
-    }
-
-    return fallback;
   }
 
   onExportPdf(): void {
